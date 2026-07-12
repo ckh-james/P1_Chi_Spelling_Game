@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Princess Spelling Kingdom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+/* ===== DYSLEXIA-FRIENDLY FONT STACK ===== */
+/* OpenDyslexic via CDN, fallback to Nunito (rounded, friendly) */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-bold.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic-bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+  --purple-deep: #1a0a2e;
+  --purple-dark: #2d1052;
+  --purple-mid: #4a1a7a;
+  --purple-glow: #7b2fbf;
+  --purple-bright: #a855f7;
+  --purple-light: #d8b4fe;
+  --purple-pale: #f3e8ff;
+  --gold: #fbbf24;
+  --gold-light: #fde68a;
+  --gold-pale: #fffbeb;
+  --pink: #f472b6;
+  --pink-pale: #fce7f3;
+  --teal: #2dd4bf;
+  --green-ok: #22c55e;
+  --red-err: #ef4444;
+  --white: #ffffff;
+  --canvas-bg: #f8f4ff;
+  --font-main: 'OpenDyslexic', 'Nunito', 'Comic Sans MS', cursive, sans-serif;
+  --font-chinese: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', serif;
+  --radius: 18px;
+  --shadow: 0 4px 24px rgba(120,30,200,0.25);
+  --shadow-btn: 0 4px 16px rgba(168,85,247,0.4);
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: var(--purple-deep);
+  font-family: var(--font-main);
+  color: var(--white);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ===== STAR BACKGROUND ===== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(168,85,247,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(244,114,182,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 0%, rgba(251,191,36,0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Stars */
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: twinkle var(--d, 3s) infinite var(--delay, 0s) ease-in-out;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.4); }
+}
+
+/* ===== APP SHELL ===== */
+#app {
+  position: relative;
+  z-index: 1;
+  max-width: 500px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+.header {
+  text-align: center;
+  padding: 18px 16px 10px;
+}
+.header-crown {
+  font-size: 2.2rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 12px #fbbf24);
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.header-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fbbf24, #f472b6, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+.header-sub {
+  font-size: 0.78rem;
+  color: var(--purple-light);
+  margin-top: 3px;
+  letter-spacing: 1px;
+}
+
+/* ===== GEM SCORE BAR ===== */
+.score-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  flex-wrap: wrap;
+}
+.score-label {
+  font-size: 0.75rem;
+  color: var(--purple-light);
+  font-weight: 700;
+}
+.gem {
+  font-size: 1.2rem;
+  filter: grayscale(1) brightness(0.5);
+  transition: filter 0.4s, transform 0.3s;
+}
+.gem.lit {
+  filter: grayscale(0) brightness(1.2) drop-shadow(0 0 8px #fbbf24);
+  transform: scale(1.2);
+  animation: gemPop 0.4s ease;
+}
+@keyframes gemPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1.2); }
+}
+.score-pts {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--gold);
+  margin-left: 4px;
+}
+
+/* ===== GAME TABS ===== */
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.07);
+  border: 2px solid rgba(168,85,247,0.3);
+  border-radius: 24px;
+  color: var(--purple-light);
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--purple-mid), var(--purple-glow));
+  border-color: var(--purple-bright);
+  color: white;
+  box-shadow: var(--shadow-btn);
+}
+.tab-btn:active { transform: scale(0.94); }
+
+/* ===== GAME PANELS ===== */
+.game-panel {
+  display: none;
+  flex: 1;
+  padding: 10px 12px 80px;
+}
+.game-panel.active { display: block; }
+
+/* ===== CARD ===== */
+.card {
+  background: rgba(45,16,82,0.7);
+  border: 1.5px solid rgba(168,85,247,0.3);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.item-badge {
+  background: linear-gradient(135deg, var(--purple-glow), var(--pink));
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(168,85,247,0.4);
+}
+.item-word {
+  font-family: var(--font-chinese);
+  font-size: 1.6rem;
+  color: var(--gold-light);
+  letter-spacing: 4px;
+  flex: 1;
+}
+.item-pinyin-hint {
+  font-size: 0.78rem;
+  color: var(--purple-light);
+  font-style: italic;
+}
+
+/* ===== AUDIO BUTTON ===== */
+.btn-audio {
+  background: linear-gradient(135deg, #4a1a7a, #7b2fbf);
+  border: 2px solid var(--purple-bright);
+  border-radius: 50px;
+  color: white;
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 10px 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-btn);
+  margin: 4px 0;
+}
+.btn-audio:active { transform: scale(0.93); background: linear-gradient(135deg, #7b2fbf, #a855f7); }
+.btn-audio.playing { animation: pulse 0.6s ease infinite alternate; }
+@keyframes pulse { from { box-shadow: 0 0 8px rgba(168,85,247,0.4); } to { box-shadow: 0 0 20px rgba(168,85,247,0.9); } }
+
+/* ===== CANVAS SECTION ===== */
+.canvas-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--purple-light);
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+.canvas-wrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+canvas {
+  display: block;
+  width: 100%;
+  height: 120px;
+  background: var(--canvas-bg);
+  border-radius: 12px;
+  border: 2px solid rgba(168,85,247,0.4);
+  cursor: crosshair;
+  touch-action: none;
+}
+.canvas-clear {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: rgba(239,68,68,0.18);
+  border: 1.5px solid rgba(239,68,68,0.5);
+  border-radius: 8px;
+  color: #fca5a5;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-family: var(--font-main);
+  font-weight: 700;
+}
+.canvas-clear:active { background: rgba(239,68,68,0.4); }
+
+/* ===== ANSWER REVEAL / SELF-MARK ===== */
+.answer-section { display: none; }
+.answer-section.visible { display: block; }
+.answer-box {
+  background: rgba(251,191,36,0.1);
+  border: 2px solid rgba(251,191,36,0.4);
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.answer-char {
+  font-family: var(--font-chinese);
+  font-size: 2.2rem;
+  color: var(--gold);
+  letter-spacing: 8px;
+}
+.answer-pinyin {
+  font-size: 1rem;
+  color: var(--gold-light);
+  margin-top: 4px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.mark-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.btn-mark {
+  flex: 1;
+  max-width: 120px;
+  padding: 12px 0;
+  border-radius: 14px;
+  border: none;
+  font-family: var(--font-main);
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-mark.correct { background: linear-gradient(135deg, #166534, #22c55e); color: white; box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
+.btn-mark.wrong   { background: linear-gradient(135deg, #7f1d1d, #ef4444); color: white; box-shadow: 0 4px 12px rgba(239,68,68,0.4); }
+.btn-mark:active  { transform: scale(0.92); }
+.btn-mark.selected-correct { background: #22c55e; outline: 3px solid white; }
+.btn-mark.selected-wrong   { background: #ef4444; outline: 3px solid white; }
+
+/* ===== ACTION BUTTONS ===== */
+.btn-action {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  border-radius: 14px;
+  border: none;
+  font-family: var(--font-main);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--purple-mid), var(--purple-glow));
+  color: white;
+  border: 2px solid var(--purple-bright);
+  box-shadow: var(--shadow-btn);
+}
+.btn-primary:active { transform: scale(0.96); }
+
+/* ===== GAME 1 PROGRESS ===== */
+.g1-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  margin-bottom: 6px;
+}
+.g1-dots {
+  display: flex;
+  gap: 6px;
+}
+.g1-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(168,85,247,0.25);
+  border: 1.5px solid rgba(168,85,247,0.4);
+  transition: all 0.3s;
+}
+.g1-dot.done-correct { background: var(--green-ok); border-color: var(--green-ok); }
+.g1-dot.done-wrong   { background: var(--red-err); border-color: var(--red-err); }
+.g1-dot.current      { background: var(--purple-bright); border-color: white; transform: scale(1.4); }
+.g1-counter { font-size: 0.8rem; color: var(--purple-light); font-weight: 700; }
+
+/* ===== GAME 2 — PINYIN FILL ===== */
+.sentence-display {
+  font-family: var(--font-chinese);
+  font-size: 1.6rem;
+  color: var(--gold-light);
+  text-align: center;
+  margin: 10px 0;
+  letter-spacing: 2px;
+  line-height: 1.6;
+}
+.blanks-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 14px 0;
+}
+.blank-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.blank-label {
+  font-size: 0.68rem;
+  color: var(--purple-light);
+  font-weight: 700;
+  text-align: center;
+  max-width: 100px;
+}
+.pinyin-input {
+  width: 110px;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(168,85,247,0.5);
+  border-radius: 10px;
+  color: white;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 9px 10px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.pinyin-input:focus { border-color: var(--purple-bright); background: rgba(255,255,255,0.15); }
+.pinyin-input.correct { border-color: var(--green-ok); background: rgba(34,197,94,0.15); color: var(--green-ok); }
+.pinyin-input.wrong   { border-color: var(--red-err); background: rgba(239,68,68,0.15); color: var(--red-err); }
+.pinyin-correct-ans   { font-size: 0.72rem; color: var(--green-ok); font-weight: 700; text-align: center; margin-top: 2px; display: none; }
+.pinyin-correct-ans.show { display: block; }
+.g2-score-msg { text-align: center; font-size: 0.9rem; font-weight: 700; color: var(--gold); margin-top: 10px; min-height: 22px; }
+
+/* ===== GAME 3 — 我会认 ===== */
+.g3-call-area {
+  background: rgba(251,191,36,0.08);
+  border: 2px solid rgba(251,191,36,0.3);
+  border-radius: var(--radius);
+  padding: 18px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.g3-call-label { font-size: 0.75rem; color: var(--purple-light); font-weight: 700; margin-bottom: 6px; }
+.g3-called-word {
+  font-family: var(--font-chinese);
+  font-size: 2.4rem;
+  color: var(--gold);
+  letter-spacing: 6px;
+  min-height: 50px;
+  line-height: 1.3;
+}
+.g3-called-pinyin { font-size: 1rem; color: var(--gold-light); font-weight: 700; margin-top: 4px; letter-spacing: 2px; }
+.g3-progress { font-size: 0.78rem; color: var(--purple-light); margin-top: 6px; }
+.g3-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.g3-word-btn {
+  position: relative;
+  background: rgba(45,16,82,0.8);
+  border: 2px solid rgba(168,85,247,0.4);
+  border-radius: 14px;
+  color: var(--gold-light);
+  font-family: var(--font-chinese);
+  font-size: 1.1rem;
+  font-size: clamp(0.8rem, 3.8vw, 1.1rem);
+  padding: 16px 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  letter-spacing: 1px;
+  word-break: break-all;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.g3-word-btn:active:not(:disabled) { transform: scale(0.9); }
+.g3-word-btn.numbered {
+  border-color: var(--green-ok);
+  background: rgba(34,197,94,0.15);
+  color: var(--green-ok);
+  cursor: default;
+}
+.g3-word-btn.wrong-tap {
+  border-color: var(--red-err);
+  background: rgba(239,68,68,0.18);
+  animation: shake 0.35s ease;
+}
+.g3-word-btn.highlight-correct {
+  border-color: var(--gold);
+  background: rgba(251,191,36,0.2);
+  animation: glow 0.6s ease;
+}
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+@keyframes glow  { 0%{box-shadow:0 0 0 rgba(251,191,36,0)} 50%{box-shadow:0 0 20px rgba(251,191,36,0.7)} 100%{box-shadow:0 0 8px rgba(251,191,36,0.3)} }
+.g3-num-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, var(--gold), #f59e0b);
+  border-radius: 50%;
+  color: var(--purple-deep);
+  font-size: 0.7rem;
+  font-weight: 900;
+  font-family: var(--font-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.g3-pinyin-sub {
+  display: block;
+  font-family: var(--font-main);
+  font-size: 0.6rem;
+  color: var(--purple-light);
+  letter-spacing: 0;
+  margin-top: 4px;
+  font-style: italic;
+}
+.g3-wrong-msg { text-align: center; font-size: 0.85rem; color: #fca5a5; font-weight: 700; min-height: 24px; margin-bottom: 8px; }
+.g3-done-msg { text-align: center; font-size: 1rem; color: var(--gold); font-weight: 800; min-height: 24px; margin-bottom: 8px; }
+
+/* ===== SECTION HEADER ===== */
+.section-hdr {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--purple-light);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-hdr::after {
+  content: '';
+  flex: 1;
+  height: 1.5px;
+  background: linear-gradient(to right, rgba(168,85,247,0.4), transparent);
+  border-radius: 2px;
+}
+
+/* ===== MODE TOGGLE ===== */
+.mode-toggle {
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  gap: 6px;
+  margin: 0 0 10px 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50px;
+  padding: 4px;
+}
+.mode-btn {
+  flex: 1;
+  border: none;
+  border-radius: 50px;
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 7px 14px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--purple-light);
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+.mode-btn.active {
+  background: linear-gradient(135deg, var(--purple-mid), var(--purple-glow));
+  color: white;
+  box-shadow: 0 2px 10px rgba(168,85,247,0.45);
+}
+.mode-btn:active { transform: scale(0.93); }
+
+/* ===== REFERENCE TILES ===== */
+.ref-section {
+  display: none;
+  margin-bottom: 14px;
+}
+.ref-section.visible { display: block; }
+.ref-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--purple-light);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.ref-tiles {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.ref-tile {
+  flex: 1;
+  max-width: 120px;
+  background: linear-gradient(145deg, rgba(74,26,122,0.9), rgba(45,16,82,0.95));
+  border: 2px solid rgba(168,85,247,0.4);
+  border-radius: 16px;
+  padding: 14px 6px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+.ref-tile:active { transform: scale(0.9); }
+.ref-tile.peeked {
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgba(251,191,36,0.55);
+  animation: peekGlow 0.6s ease forwards;
+}
+@keyframes peekGlow {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.ref-tile-char {
+  font-family: var(--font-chinese);
+  font-size: 1.5rem;
+  font-size: clamp(1rem, 5vw, 1.5rem);
+  color: var(--gold-light);
+  line-height: 1.3;
+  display: block;
+  word-break: break-all;
+}
+.ref-tile-hint {
+  font-size: 0.6rem;
+  color: rgba(216,180,254,0.5);
+  margin-top: 5px;
+  font-weight: 700;
+}
+
+/* ===== RESET GAME BUTTON ===== */
+.btn-reset {
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(168,85,247,0.3);
+  border-radius: 12px;
+  color: var(--purple-light);
+  font-family: var(--font-main);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  cursor: pointer;
+  margin: 6px auto;
+  display: block;
+}
+.btn-reset:active { background: rgba(168,85,247,0.15); }
+
+/* ===== CONFETTI ===== */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== TTS STATUS ===== */
+.tts-status {
+  text-align: center;
+  font-size: 0.7rem;
+  color: rgba(168,85,247,0.6);
+  padding: 2px 0 6px;
+}
+
+/* ===== UTILITY ===== */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mt8 { margin-top: 8px; }
+.flex-row { display: flex; gap: 8px; align-items: center; }
+.flex-wrap { flex-wrap: wrap; }
+.justify-center { justify-content: center; }
+</style>
+</head>
+<body>
+
+<!-- Star background -->
+<div class="stars" id="stars"></div>
+
+<!-- Confetti container -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-crown">👑</div>
+    <div class="header-title">Princess Spelling Kingdom</div>
+    <div class="header-sub">听写练习 · Spelling Practice</div>
+  </div>
+
+  <!-- TTS STATUS -->
+  <div class="tts-status" id="ttsStatus">🔈 Loading voices…</div>
+
+  <!-- GEM SCORE BAR -->
+  <div class="score-bar">
+    <span class="score-label">✨ Gems:</span>
+    <span class="gem" id="gem0">💎</span>
+    <span class="gem" id="gem1">💎</span>
+    <span class="gem" id="gem2">💎</span>
+    <span class="gem" id="gem3">💎</span>
+    <span class="gem" id="gem4">💎</span>
+    <span class="gem" id="gem5">💎</span>
+    <span class="gem" id="gem6">💎</span>
+    <span class="score-pts" id="scoreDisplay">0 / 33 pts</span>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('g1')" id="tab-g1">✍️ 我会写</button>
+    <button class="tab-btn" onclick="switchTab('g2')" id="tab-g2">🏰 填拼音</button>
+    <button class="tab-btn" onclick="switchTab('g3')" id="tab-g3">🔢 我会认</button>
+  </div>
+
+  <!-- ===================================== -->
+  <!-- GAME 1: 我会写 (Write It)            -->
+  <!-- ===================================== -->
+  <div class="game-panel active" id="g1">
+
+    <div class="g1-nav">
+      <span class="g1-counter" id="g1Counter">词语 1 / 11</span>
+      <div class="g1-dots" id="g1DotsContainer"></div>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeBtnTest"    onclick="g1SetMode('test')">📝 Test</button>
+      <button class="mode-btn"        id="modeBtnGuided"  onclick="g1SetMode('guided')">📖 Guided</button>
+    </div>
+
+    <div class="card" id="g1Card">
+      <div class="card-header">
+        <div class="item-badge" id="g1Num">1</div>
+        <div id="g1HintText">
+          <div class="item-pinyin-hint">🖊️ 听写 — 先听，再写</div>
+        </div>
+      </div>
+
+      <!-- Audio button -->
+      <button class="btn-audio" id="g1PlayBtn" onclick="g1Play()">
+        🔊 Play Word
+      </button>
+
+      <!-- REFERENCE TILES (Guided mode only) -->
+      <div class="ref-section" id="g1RefSection">
+        <div class="ref-label">👁️ Look and write — tap a tile to hear it:</div>
+        <div class="ref-tiles" id="g1RefTiles"></div>
+      </div>
+
+      <!-- Hanzi canvas -->
+      <div class="canvas-label">✏️ Write the Chinese character(s):</div>
+      <div class="canvas-wrap">
+        <canvas id="g1CanvasChar" height="240"></canvas>
+        <button class="canvas-clear" onclick="clearCanvas('g1CanvasChar')">🗑 Clear</button>
+      </div>
+
+      <!-- Pinyin canvas -->
+      <div class="canvas-label">🔤 Write the pinyin:</div>
+      <div class="canvas-wrap">
+        <canvas id="g1CanvasPinyin" height="240"></canvas>
+        <button class="canvas-clear" onclick="clearCanvas('g1CanvasPinyin')">🗑 Clear</button>
+      </div>
+
+      <!-- Show Answer button -->
+      <button class="btn-action btn-primary" id="g1ShowBtn" onclick="g1ShowAnswer()">
+        ✅ Done — Show Answer
+      </button>
+
+      <!-- Answer reveal + self-mark -->
+      <div class="answer-section" id="g1Answer">
+        <div class="answer-box">
+          <div class="answer-char" id="g1AnsChar"></div>
+          <div class="answer-pinyin" id="g1AnsPinyin"></div>
+        </div>
+        <div class="mark-row">
+          <button class="btn-mark correct" id="g1MarkRight" onclick="g1Mark(true)">✅ Correct! +2</button>
+          <button class="btn-mark wrong"   id="g1MarkWrong" onclick="g1Mark(false)">❌ Try Again</button>
+        </div>
+      </div>
+
+      <!-- Next button -->
+      <button class="btn-action btn-primary hidden" id="g1NextBtn" onclick="g1Next()">
+        ➡️ Next Word
+      </button>
+
+    </div><!-- end card -->
+
+    <div class="text-center" id="g1DoneMsg" style="display:none; padding:20px;">
+      <div style="font-size:2rem; margin-bottom:10px;">🌟</div>
+      <div style="font-size:1.1rem; font-weight:800; color:var(--gold);">写完了！Well done, Princess! 👑</div>
+      <div id="g1ScoreMsg" style="font-size:0.9rem; color:var(--purple-light); margin-top:8px;"></div>
+      <button class="btn-reset" onclick="resetG1()">🔄 Practice Again</button>
+    </div>
+
+  </div><!-- end g1 -->
+
+
+  <!-- ===================================== -->
+  <!-- GAME 2: Sentence Pinyin Fill         -->
+  <!-- ===================================== -->
+  <div class="game-panel" id="g2">
+
+    <div class="section-hdr">🏰 Sentence Practice</div>
+
+    <div class="card" style="text-align:center; padding:32px 20px;">
+      <div style="font-size:2.8rem; margin-bottom:14px;">📝</div>
+      <div style="font-size:1rem; font-weight:800; color:var(--gold); margin-bottom:10px;">No Sentence This Week</div>
+      <div style="font-size:0.85rem; color:var(--purple-light); line-height:1.6;">
+        第十一课 does not have a<br>sentence 听写 exercise.<br><br>
+        Practice <strong style="color:var(--purple-light);">我会写</strong> and <strong style="color:var(--purple-light);">我会认</strong><br>using the other two tabs! 🌟
+      </div>
+    </div>
+
+  </div><!-- end g2 -->
+
+
+  <!-- ===================================== -->
+  <!-- GAME 3: 我会认 (Number It)           -->
+  <!-- ===================================== -->
+  <div class="game-panel" id="g3">
+
+    <div class="section-hdr">🔢 我会认 — Number It!</div>
+
+    <!-- Teacher's call -->
+    <div class="g3-call-area">
+      <div class="g3-call-label">👩‍🏫 Teacher calls:</div>
+      <div class="g3-called-word" id="g3CalledWord">—</div>
+      <div class="g3-called-pinyin" id="g3CalledPinyin"></div>
+      <div class="g3-progress" id="g3Progress">Tap ▶ to begin</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex-row justify-center" style="margin-bottom:12px; gap:10px;">
+      <button class="btn-audio" id="g3PlayBtn" onclick="g3Call()">▶️ Call Next Word</button>
+      <button class="btn-audio" id="g3RepeatBtn" onclick="g3Repeat()" style="background:linear-gradient(135deg,#3b0764,#6d28d9);">🔁 Repeat</button>
+    </div>
+
+    <div class="g3-wrong-msg" id="g3WrongMsg"></div>
+    <div class="g3-done-msg" id="g3DoneMsg"></div>
+
+    <!-- Word grid -->
+    <div class="g3-grid" id="g3Grid"></div>
+
+    <button class="btn-reset" onclick="resetG3()">🔄 Play Again</button>
+
+  </div><!-- end g3 -->
+
+</div><!-- end app -->
+
+<script>
+/* ============================================================
+   LESSON DATA
+============================================================ */
+var words = [
+  { char: '吃',    pinyin: 'chī' },
+  { char: '米',    pinyin: 'mǐ' },
+  { char: '虫子',  pinyin: 'chóng zi' },
+  { char: '今天',  pinyin: 'jīn tiān' },
+  { char: '包子',  pinyin: 'bāo zi' },
+  { char: '半个',  pinyin: 'bàn gè' },
+  { char: '两元',  pinyin: 'liǎng yuán' },
+  { char: '豆子',  pinyin: 'dòu zi' },
+  { char: '肉干',  pinyin: 'ròu gān' },
+  { char: '几个',  pinyin: 'jǐ gè' },
+  { char: '可开心了', pinyin: 'kě kāi xīn le' }
+];
+
+var recog = [
+  { char: '饼',    pinyin: 'bǐng' },
+  { char: '鸭饭',  pinyin: 'yā fàn' },
+  { char: '鸡蛋',  pinyin: 'jī dàn' },
+  { char: '饿了',  pinyin: 'è le' },
+  { char: '饱了',  pinyin: 'bǎo le' },
+  { char: '唱歌',  pinyin: 'chàng gē' },
+  { char: '小狗',  pinyin: 'xiǎo gǒu' },
+  { char: '喜欢',  pinyin: 'xǐ huān' },
+  { char: '小猫',  pinyin: 'xiǎo māo' },
+  { char: '采果子', pinyin: 'cǎi guǒ zi' },
+  { char: '青菜汤好香', pinyin: 'qīng cài tāng hǎo xiāng' }
+];
+
+// G2 (sentence practice) not used for this lesson
+
+/* ============================================================
+   TOTAL SCORE
+   G1: 22 pts (11 words × 2 each)
+   G2:  0 pts (no sentence this lesson)
+   G3: 11 pts (11 recog words × 1 each)
+   Total: 33 pts; gems light at 5/10/15/20/25/30/33
+============================================================ */
+var GEM_THRESHOLDS = [5, 10, 15, 20, 25, 30, 33];
+var totalScore = 0;
+var g1Scores = [0,0,0,0,0,0,0,0,0,0,0]; // 11 words, 0 or 2 pts each
+var g2Score = 0;               // 0 (no sentence)
+var g3Score = 0;               // 0-11
+
+/* ============================================================
+   TTS SETUP
+============================================================ */
+var ttsVoice = null;
+var ttsReady = false;
+
+function initTTS() {
+  if (!window.speechSynthesis) {
+    document.getElementById('ttsStatus').textContent = '⚠️ TTS not available on this browser';
+    return;
+  }
+  function loadVoices() {
+    var voices = window.speechSynthesis.getVoices();
+    // Prefer zh-CN female voices
+    var preferred = voices.filter(function(v) {
+      return v.lang && v.lang.indexOf('zh') >= 0;
+    });
+    // Try to pick female
+    var female = preferred.filter(function(v) {
+      return /female|tingting|meijia|microsoft huihui|microsoft yaoyao/i.test(v.name);
+    });
+    ttsVoice = female[0] || preferred[0] || null;
+    ttsReady = true;
+    var statusEl = document.getElementById('ttsStatus');
+    if (ttsVoice) {
+      statusEl.textContent = '🎙️ Voice: ' + ttsVoice.name.substring(0, 28);
+    } else {
+      statusEl.textContent = '🔈 TTS ready (default voice)';
+    }
+  }
+  if (window.speechSynthesis.getVoices().length > 0) {
+    loadVoices();
+  }
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function speakChinese(text, onEnd) {
+  if (!window.speechSynthesis) {
+    if (onEnd) onEnd();
+    return;
+  }
+  // Cancel any ongoing speech
+  window.speechSynthesis.cancel();
+  var utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'zh-CN';
+  utter.rate = 0.82;
+  utter.pitch = 1.1;
+  utter.volume = 1.0;
+  if (ttsVoice) utter.voice = ttsVoice;
+  if (onEnd) utter.onend = onEnd;
+  utter.onerror = function() { if (onEnd) onEnd(); };
+  window.speechSynthesis.speak(utter);
+}
+
+// Workaround for iOS/Android WebView: resume synthesis if paused by OS
+document.addEventListener('visibilitychange', function() {
+  if (!window.speechSynthesis) return;
+  if (document.visibilityState === 'visible') {
+    window.speechSynthesis.resume();
+  }
+});
+// Workaround for iOS: iOS sometimes pauses TTS mid-utterance.
+// Periodically call resume() while speaking.
+setInterval(function() {
+  if (!window.speechSynthesis) return;
+  if (window.speechSynthesis.paused && window.speechSynthesis.speaking) {
+    window.speechSynthesis.resume();
+  }
+}, 2000);
+// Note: all TTS calls must originate from direct user gesture (tap/click) for iOS compatibility.
+
+/* ============================================================
+   STAR BACKGROUND
+============================================================ */
+function buildStars() {
+  var container = document.getElementById('stars');
+  var html = '';
+  for (var i = 0; i < 60; i++) {
+    var size = Math.random() * 2.5 + 0.8;
+    var left = Math.random() * 100;
+    var top  = Math.random() * 100;
+    var delay = Math.random() * 4;
+    var dur   = 2 + Math.random() * 3;
+    html += '<div class="star" style="width:' + size + 'px;height:' + size + 'px;left:' + left + '%;top:' + top + '%;--d:' + dur + 's;--delay:' + delay + 's"></div>';
+  }
+  container.innerHTML = html;
+}
+
+/* ============================================================
+   SCORE / GEM SYSTEM
+============================================================ */
+function updateScore() {
+  totalScore = 0;
+  for (var i = 0; i < g1Scores.length; i++) totalScore += g1Scores[i];
+  totalScore += g2Score + g3Score;
+  document.getElementById('scoreDisplay').textContent = totalScore + ' / 33 pts';
+  for (var g = 0; g < GEM_THRESHOLDS.length; g++) {
+    var gemEl = document.getElementById('gem' + g);
+    if (totalScore >= GEM_THRESHOLDS[g]) {
+      if (!gemEl.classList.contains('lit')) {
+        gemEl.classList.add('lit');
+        if (totalScore === GEM_THRESHOLDS[g]) confettiBurst(4);
+      }
+    } else {
+      gemEl.classList.remove('lit');
+    }
+  }
+  if (totalScore >= 33) confettiBurst(30);
+}
+
+/* ============================================================
+   CONFETTI
+============================================================ */
+function confettiBurst(count) {
+  var colors = ['#fbbf24','#a855f7','#f472b6','#22c55e','#2dd4bf','#ffffff'];
+  var container = document.getElementById('confettiContainer');
+  for (var i = 0; i < count; i++) {
+    (function() {
+      var el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = (Math.random() * 100) + '%';
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.width  = (6 + Math.random() * 10) + 'px';
+      el.style.height = (6 + Math.random() * 10) + 'px';
+      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      var dur = 1.5 + Math.random() * 2;
+      el.style.animationDuration = dur + 's';
+      el.style.animationDelay = (Math.random() * 0.5) + 's';
+      container.appendChild(el);
+      setTimeout(function() { el.remove(); }, (dur + 0.6) * 1000);
+    })();
+  }
+}
+
+/* ============================================================
+   TAB SWITCHING
+============================================================ */
+function switchTab(id) {
+  ['g1','g2','g3'].forEach(function(t) {
+    document.getElementById(t).classList.remove('active');
+    document.getElementById('tab-' + t).classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+  // Re-size canvases when returning to G1 (they may have been hidden during init)
+  if (id === 'g1') {
+    setTimeout(function() {
+      resizeCanvas('g1CanvasChar');
+      resizeCanvas('g1CanvasPinyin');
+    }, 60);
+  }
+}
+
+/* ============================================================
+   CANVAS HELPERS
+============================================================ */
+var canvases = {};
+
+/* resizeCanvas: only updates dimensions on an already-initialised canvas.
+   Clamps to parent width when the panel is visible. */
+function resizeCanvas(id) {
+  var obj = canvases[id];
+  if (!obj) { initCanvas(id); return; }
+  var canvas = obj.canvas;
+  var dpr = window.devicePixelRatio || 1;
+  var parent = canvas.parentElement;
+  var w = canvas.getBoundingClientRect().width;
+  if (w <= 0 && parent) w = parent.clientWidth - 4; // subtract border
+  if (w <= 0) w = 300;
+  canvas.width  = Math.floor(w * dpr);
+  canvas.height = Math.floor(120 * dpr);
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.strokeStyle = '#3b0764';
+  ctx.lineWidth = 3.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  obj.ctx = ctx;
+}
+
+function initCanvas(id) {
+  var canvas = document.getElementById(id);
+  if (!canvas) return;
+
+  // If already initialised, just resize — don't re-add listeners
+  if (canvases[id]) { resizeCanvas(id); return; }
+
+  var dpr = window.devicePixelRatio || 1;
+  var parent = canvas.parentElement;
+  var w = canvas.getBoundingClientRect().width;
+  if (w <= 0 && parent) w = parent.clientWidth - 4;
+  if (w <= 0) w = 300;
+  canvas.width  = Math.floor(w * dpr);
+  canvas.height = Math.floor(120 * dpr);
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.strokeStyle = '#3b0764';
+  ctx.lineWidth = 3.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // Store first so resizeCanvas can find it
+  canvases[id] = { canvas: canvas, ctx: ctx };
+
+  var drawing = false;
+  var lastX = 0, lastY = 0;
+
+  function getPos(e) {
+    var r = canvas.getBoundingClientRect();
+    if (r.width === 0) return { x: 0, y: 0 };
+    var src = e.touches ? e.touches[0] : (e.changedTouches ? e.changedTouches[0] : e);
+    var x = (src.clientX - r.left) * (canvas.width  / dpr / r.width);
+    var y = (src.clientY - r.top)  * (canvas.height / dpr / r.height);
+    return { x: x, y: y };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    drawing = true;
+    var p = getPos(e);
+    lastX = p.x; lastY = p.y;
+    var c = canvases[id].ctx;
+    c.beginPath();
+    c.arc(lastX, lastY, 1.5, 0, Math.PI*2);
+    c.fillStyle = '#3b0764';
+    c.fill();
+  }
+  function moveDraw(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    var p = getPos(e);
+    var c = canvases[id].ctx;
+    c.beginPath();
+    c.moveTo(lastX, lastY);
+    c.lineTo(p.x, p.y);
+    c.stroke();
+    lastX = p.x; lastY = p.y;
+  }
+  function endDraw(e) {
+    e.preventDefault();
+    drawing = false;
+  }
+
+  // Pointer Events (stylus + touch + mouse — preferred)
+  canvas.addEventListener('pointerdown',   startDraw, { passive: false });
+  canvas.addEventListener('pointermove',   moveDraw,  { passive: false });
+  canvas.addEventListener('pointerup',     endDraw,   { passive: false });
+  canvas.addEventListener('pointercancel', endDraw,   { passive: false });
+
+  // Touch fallback for browsers without Pointer Events
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove',  moveDraw,  { passive: false });
+  canvas.addEventListener('touchend',   endDraw,   { passive: false });
+}
+
+function clearCanvas(id) {
+  var obj = canvases[id];
+  if (!obj) return;
+  var dpr = window.devicePixelRatio || 1;
+  obj.ctx.clearRect(0, 0, obj.canvas.width / dpr, obj.canvas.height / dpr);
+}
+
+// Also update the on-resize handler to only resize, not re-init
+window.addEventListener('resize', function() {
+  setTimeout(function() {
+    resizeCanvas('g1CanvasChar');
+    resizeCanvas('g1CanvasPinyin');
+  }, 200);
+});
+
+/* ============================================================
+   GAME 1: 我会写
+============================================================ */
+var g1idx = 0;
+var g1Marked = false;
+var g1GuidedMode = false;   // false = Test, true = Guided
+
+function g1SetMode(mode) {
+  g1GuidedMode = (mode === 'guided');
+  // Use explicit add/remove (classList.toggle(name,bool) not safe on older Android)
+  if (g1GuidedMode) {
+    document.getElementById('modeBtnTest').classList.remove('active');
+    document.getElementById('modeBtnGuided').classList.add('active');
+  } else {
+    document.getElementById('modeBtnTest').classList.add('active');
+    document.getElementById('modeBtnGuided').classList.remove('active');
+  }
+  // Rebuild ref tiles for current word if switching mid-session
+  if (g1GuidedMode) {
+    g1BuildRefTiles();
+    document.getElementById('g1RefSection').classList.add('visible');
+  } else {
+    document.getElementById('g1RefSection').classList.remove('visible');
+  }
+}
+
+/* Pick 2 distractor indices (different from current word) */
+function g1GetDistractors(currentIdx) {
+  var pool = [];
+  for (var i = 0; i < words.length; i++) {
+    if (i !== currentIdx) pool.push(i);
+  }
+  // Fisher-Yates on pool, take first 2
+  for (var j = pool.length - 1; j > 0; j--) {
+    var k = Math.floor(Math.random() * (j + 1));
+    var tmp = pool[j]; pool[j] = pool[k]; pool[k] = tmp;
+  }
+  return [pool[0], pool[1]];
+}
+
+function g1BuildRefTiles() {
+  var distractors = g1GetDistractors(g1idx);
+  // Build array of 3 tile indices: correct + 2 distractors, then shuffle
+  var tileIndices = [g1idx, distractors[0], distractors[1]];
+  for (var i = tileIndices.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = tileIndices[i]; tileIndices[i] = tileIndices[j]; tileIndices[j] = tmp;
+  }
+  var html = '';
+  for (var t = 0; t < tileIndices.length; t++) {
+    var wi = tileIndices[t];
+    html += '<div class="ref-tile" onclick="g1PeekTile(this,' + wi + ')">'
+          + '<span class="ref-tile-char">' + words[wi].char + '</span>'
+          + '<span class="ref-tile-hint">tap to hear</span>'
+          + '</div>';
+  }
+  document.getElementById('g1RefTiles').innerHTML = html;
+}
+
+function g1PeekTile(el, wordIdx) {
+  // Remove peeked from all tiles first
+  var tiles = document.querySelectorAll('.ref-tile');
+  for (var i = 0; i < tiles.length; i++) tiles[i].classList.remove('peeked');
+  el.classList.add('peeked');
+  speakChinese(words[wordIdx].char, null);
+  setTimeout(function() { el.classList.remove('peeked'); }, 800);
+}
+
+function g1BuildDots() {
+  var container = document.getElementById('g1DotsContainer');
+  var html = '';
+  for (var i = 0; i < words.length; i++) {
+    html += '<div class="g1-dot" id="g1dot' + i + '"></div>';
+  }
+  container.innerHTML = html;
+}
+
+function g1Init() {
+  g1idx = 0;
+  g1Scores = words.map(function(){ return 0; });
+  g1Marked = false;
+  g1BuildDots();
+  g1Render();
+  // Init canvases: use two-stage delay so layout is fully computed
+  setTimeout(function() {
+    initCanvas('g1CanvasChar');
+    initCanvas('g1CanvasPinyin');
+  }, 150);
+}
+
+function g1Render() {
+  // Update dots dynamically
+  for (var i = 0; i < words.length; i++) {
+    var dot = document.getElementById('g1dot' + i);
+    if (!dot) continue;
+    dot.className = 'g1-dot';
+    if (i < g1idx) {
+      dot.classList.add(g1Scores[i] > 0 ? 'done-correct' : 'done-wrong');
+    } else if (i === g1idx) {
+      dot.classList.add('current');
+    }
+  }
+  document.getElementById('g1Counter').textContent = '词语 ' + (g1idx+1) + ' / ' + words.length;
+  document.getElementById('g1Num').textContent = g1idx + 1;
+
+  // Reset UI
+  document.getElementById('g1Answer').classList.remove('visible');
+  document.getElementById('g1NextBtn').classList.add('hidden');
+  document.getElementById('g1ShowBtn').style.display = 'block';
+  document.getElementById('g1Card').style.display = 'block';
+  document.getElementById('g1DoneMsg').style.display = 'none';
+  document.getElementById('g1MarkRight').className = 'btn-mark correct';
+  document.getElementById('g1MarkWrong').className = 'btn-mark wrong';
+  g1Marked = false;
+
+  clearCanvas('g1CanvasChar');
+  clearCanvas('g1CanvasPinyin');
+
+  // Guided mode: show ref tiles; Test mode: hide
+  if (g1GuidedMode) {
+    g1BuildRefTiles();
+    document.getElementById('g1RefSection').classList.add('visible');
+    document.getElementById('g1HintText').innerHTML = '<div class="item-pinyin-hint">📖 Guided — look at the tiles, then write</div>';
+  } else {
+    document.getElementById('g1RefSection').classList.remove('visible');
+    document.getElementById('g1HintText').innerHTML = '<div class="item-pinyin-hint">🖊️ 听写 — 先听，再写</div>';
+  }
+
+  document.getElementById('g1PlayBtn').innerHTML = '🔊 Play Word';
+}
+
+function g1Play() {
+  var btn = document.getElementById('g1PlayBtn');
+  btn.classList.add('playing');
+  speakChinese(words[g1idx].char, function() {
+    btn.classList.remove('playing');
+  });
+}
+
+function g1ShowAnswer() {
+  document.getElementById('g1AnsChar').textContent   = words[g1idx].char;
+  document.getElementById('g1AnsPinyin').textContent = words[g1idx].pinyin;
+  document.getElementById('g1Answer').classList.add('visible');
+  document.getElementById('g1ShowBtn').style.display = 'none';
+  // Re-speak so child hears while checking
+  speakChinese(words[g1idx].char, null);
+}
+
+function g1Mark(correct) {
+  if (g1Marked) return;
+  g1Marked = true;
+  var pts = correct ? 2 : 0;
+  g1Scores[g1idx] = pts;
+  document.getElementById('g1MarkRight').className = 'btn-mark correct' + (correct ? ' selected-correct' : '');
+  document.getElementById('g1MarkWrong').className = 'btn-mark wrong'   + (!correct ? ' selected-wrong' : '');
+  updateScore();
+  if (correct) confettiBurst(6);
+  document.getElementById('g1NextBtn').classList.remove('hidden');
+}
+
+function g1Next() {
+  g1idx++;
+  if (g1idx >= words.length) {
+    // Done
+    document.getElementById('g1Card').style.display = 'none';
+    document.getElementById('g1DoneMsg').style.display = 'block';
+    var total = 0;
+    for (var i = 0; i < g1Scores.length; i++) total += g1Scores[i];
+    var maxPts = words.length * 2;
+    document.getElementById('g1ScoreMsg').textContent = '得分：' + total + ' / ' + maxPts + ' 分';
+    if (total === maxPts) confettiBurst(30);
+  } else {
+    g1Render();
+  }
+}
+
+function resetG1() {
+  g1Scores = words.map(function(){ return 0; });
+  g1idx = 0;
+  g1BuildDots();
+  g1Render();
+  updateScore();
+}
+
+/* ============================================================
+   GAME 2: Sentence Pinyin Fill — stubbed (no sentence Lesson 11)
+============================================================ */
+function g2Play()  { /* no sentence this lesson */ }
+function g2Check() { /* no sentence this lesson */ }
+function resetG2() { /* no sentence this lesson */ }
+
+/* ============================================================
+   GAME 3: 我会认
+============================================================ */
+var g3Order = [];       // shuffled indices of recog[]
+var g3Called = -1;      // which word has been called (index into g3Order)
+var g3WordState = [];   // 0=pending, 1=correct
+var g3Active = false;   // true when a word has been called and awaiting tap
+
+function g3Init() {
+  // Shuffle recognition words
+  g3Order = recog.map(function(_,i){return i;});
+  for (var i = g3Order.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i+1));
+    var tmp = g3Order[i]; g3Order[i] = g3Order[j]; g3Order[j] = tmp;
+  }
+  g3Called = -1;
+  g3WordState = recog.map(function(){return 0;});
+  g3Score = 0;
+  g3Active = false;
+  document.getElementById('g3CalledWord').textContent = '—';
+  document.getElementById('g3CalledPinyin').textContent = '';
+  document.getElementById('g3Progress').textContent = 'Tap ▶ to begin';
+  document.getElementById('g3WrongMsg').textContent = '';
+  document.getElementById('g3DoneMsg').textContent = '';
+  document.getElementById('g3RepeatBtn').disabled = true;
+  document.getElementById('g3PlayBtn').disabled = false;
+  g3BuildGrid();
+}
+
+function g3BuildGrid() {
+  // Shuffle display order (different from call order)
+  var displayOrder = recog.map(function(_,i){return i;});
+  for (var i = displayOrder.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i+1));
+    var tmp = displayOrder[i]; displayOrder[i] = displayOrder[j]; displayOrder[j] = tmp;
+  }
+  var grid = document.getElementById('g3Grid');
+  var html = '';
+  for (var k = 0; k < displayOrder.length; k++) {
+    var idx = displayOrder[k];
+    var w = recog[idx];
+    html += '<button class="g3-word-btn" id="g3btn'+idx+'" onclick="g3Tap('+idx+')">' + w.char + '</button>';
+  }
+  grid.innerHTML = html;
+}
+
+function g3Call() {
+  g3Called++;
+  if (g3Called >= g3Order.length) {
+    // All called
+    document.getElementById('g3PlayBtn').disabled = true;
+    return;
+  }
+  g3Active = true;
+  document.getElementById('g3WrongMsg').textContent = '';
+  document.getElementById('g3RepeatBtn').disabled = false;
+
+  var wordIdx = g3Order[g3Called];
+  var w = recog[wordIdx];
+  document.getElementById('g3CalledWord').textContent   = '🎵';
+  document.getElementById('g3CalledPinyin').textContent = '';
+  document.getElementById('g3Progress').textContent = (g3Called+1) + ' of ' + g3Order.length + ' called';
+
+  var btn = document.getElementById('g3PlayBtn');
+  btn.classList.add('playing');
+  speakChinese(w.char, function() {
+    btn.classList.remove('playing');
+  });
+
+  if (g3Called >= g3Order.length - 1) {
+    document.getElementById('g3PlayBtn').disabled = true;
+  }
+}
+
+function g3Repeat() {
+  if (g3Called < 0 || g3Called >= g3Order.length) return;
+  var wordIdx = g3Order[g3Called];
+  var w = recog[wordIdx];
+  speakChinese(w.char, null);
+}
+
+function g3Tap(idx) {
+  if (!g3Active || g3Called < 0) return;
+  var targetIdx = g3Order[g3Called];
+
+  // If the tapped word is already numbered (correct from a previous call), ignore
+  if (g3WordState[idx] === 1) return;
+
+  var btn = document.getElementById('g3btn'+idx);
+
+  if (idx === targetIdx) {
+    // Correct!
+    g3WordState[idx] = 1;
+    g3Score++;
+    var matchCount = g3Score; // g3Score == number correctly matched so far
+    btn.innerHTML = recog[idx].char + '<div class="g3-num-badge">' + matchCount + '</div>';
+    btn.classList.add('numbered');
+    btn.disabled = true;
+    g3Active = false;
+    confettiBurst(8);
+    document.getElementById('g3WrongMsg').textContent = '';
+    updateScore();
+
+    if (g3Score === recog.length) {
+      document.getElementById('g3DoneMsg').textContent = '🏆 All done! Perfect score! 👑';
+      confettiBurst(40);
+    }
+  } else {
+    // Wrong tap
+    btn.classList.add('wrong-tap');
+    setTimeout(function(){btn.classList.remove('wrong-tap');}, 400);
+    // Highlight the correct one briefly
+    var correctBtn = document.getElementById('g3btn'+targetIdx);
+    correctBtn.classList.add('highlight-correct');
+    setTimeout(function(){correctBtn.classList.remove('highlight-correct');}, 900);
+    document.getElementById('g3WrongMsg').textContent = '❌ Oops! The answer is: ' + recog[targetIdx].char;
+    speakChinese(recog[targetIdx].char, null);
+  }
+}
+
+function resetG3() {
+  g3Score = 0;
+  g3Init();
+  updateScore();
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+window.addEventListener('load', function() {
+  buildStars();
+  initTTS();
+
+  // Delay canvas init slightly so layout is computed
+  setTimeout(function() {
+    g1Init();
+    g3Init();
+  }, 150);
+});
+
+// Re-size canvases on orientation change
+window.addEventListener('orientationchange', function() {
+  setTimeout(function() {
+    resizeCanvas('g1CanvasChar');
+    resizeCanvas('g1CanvasPinyin');
+  }, 300);
+});
+</script>
+</body>
+</html>
