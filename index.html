@@ -787,6 +787,159 @@ canvas {
 .flex-row { display: flex; gap: 8px; align-items: center; }
 .flex-wrap { flex-wrap: wrap; }
 .justify-center { justify-content: center; }
+
+/* ===== ADMIN PANEL ===== */
+.admin-trigger {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(168,85,247,0.18);
+  border-radius: 50%;
+  color: rgba(168,85,247,0.35);
+  font-size: 0.9rem;
+  cursor: pointer;
+  z-index: 200;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s;
+}
+.admin-trigger:active { background: rgba(168,85,247,0.15); color: var(--purple-bright); }
+
+.admin-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8,2,18,0.94);
+  z-index: 600;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.admin-overlay.open { display: block; }
+.admin-panel {
+  background: #160830;
+  border: 1.5px solid rgba(168,85,247,0.3);
+  border-radius: 22px 22px 0 0;
+  margin-top: 44px;
+  padding: 20px 16px 50px;
+  min-height: calc(100vh - 44px);
+}
+.admin-hdr {
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.admin-hdr-title { font-size: 1rem; font-weight: 900; color: var(--gold); }
+.admin-close-btn {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+}
+/* Admin states */
+.adm-state { display: none; }
+.adm-state.adm-active { display: block; }
+/* Upload */
+.adm-label { font-size: 0.72rem; font-weight: 700; color: var(--purple-light); display: block; margin-bottom: 5px; }
+.adm-text-input {
+  width: 100%;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(168,85,247,0.4);
+  border-radius: 10px;
+  color: white;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.adm-text-input:focus { border-color: var(--purple-bright); }
+.adm-upload-zone {
+  border: 2px dashed rgba(168,85,247,0.4);
+  border-radius: 16px;
+  padding: 28px 16px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: border-color 0.2s, background 0.2s;
+  touch-action: manipulation;
+}
+.adm-upload-zone:active { border-color: var(--purple-bright); background: rgba(168,85,247,0.07); }
+.adm-upload-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+.adm-upload-text { font-size: 0.88rem; color: var(--purple-light); font-weight: 700; }
+.adm-upload-sub  { font-size: 0.7rem; color: rgba(168,85,247,0.45); margin-top: 4px; }
+.adm-preview {
+  width: 100%; max-height: 210px; object-fit: contain;
+  border-radius: 12px; border: 1.5px solid rgba(168,85,247,0.3);
+  margin-bottom: 14px; display: none;
+}
+/* Scanning */
+.adm-spin-wrap { text-align: center; padding: 50px 20px; }
+.adm-spin-icon { font-size: 2.8rem; display: block; margin-bottom: 14px; animation: admSpin 1.3s ease-in-out infinite; }
+@keyframes admSpin { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:0.65} }
+.adm-spin-text { font-size: 0.95rem; color: var(--purple-light); font-weight: 700; }
+/* Review */
+.adm-err {
+  background: rgba(239,68,68,0.1); border: 1.5px solid rgba(239,68,68,0.4);
+  border-radius: 10px; color: #fca5a5; font-size: 0.8rem; font-weight: 700;
+  padding: 10px 14px; margin-bottom: 14px; display: none;
+}
+.adm-err.show { display: block; }
+.adm-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.adm-col-hdr { font-size: 0.78rem; font-weight: 800; color: var(--gold); text-align: center; margin-bottom: 8px; }
+.adm-row { display: -webkit-flex; display: flex; gap: 4px; align-items: center; margin-bottom: 5px; }
+.adm-char-inp {
+  width: 50px; flex-shrink: 0;
+  background: rgba(255,255,255,0.07); border: 1.5px solid rgba(168,85,247,0.4);
+  border-radius: 8px; color: var(--gold-light); font-family: var(--font-chinese);
+  font-size: 1rem; padding: 7px 3px; text-align: center; outline: none; -webkit-appearance: none;
+}
+.adm-pin-inp {
+  flex: 1; min-width: 0;
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(45,212,191,0.3);
+  border-radius: 8px; color: var(--teal); font-family: var(--font-main);
+  font-size: 0.63rem; padding: 7px 5px; outline: none; -webkit-appearance: none;
+}
+.adm-del { background: none; border: none; color: rgba(239,68,68,0.55); font-size: 0.85rem; cursor: pointer; padding: 4px 2px; touch-action: manipulation; flex-shrink: 0; }
+.adm-add {
+  width: 100%; background: rgba(168,85,247,0.08);
+  border: 1.5px dashed rgba(168,85,247,0.35); border-radius: 8px;
+  color: var(--purple-light); font-family: var(--font-main); font-size: 0.72rem;
+  font-weight: 700; padding: 7px; cursor: pointer; margin-top: 4px; touch-action: manipulation;
+}
+.adm-load-btn {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, #14532d, #16a34a);
+  border: none; border-radius: 14px; color: white;
+  font-family: var(--font-main); font-size: 1rem; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(22,163,74,0.35);
+  touch-action: manipulation; margin-bottom: 8px;
+}
+.adm-load-btn:active { transform: scale(0.96); }
+.adm-back-btn {
+  width: 100%; padding: 11px;
+  background: rgba(255,255,255,0.05); border: 1.5px solid rgba(168,85,247,0.25);
+  border-radius: 12px; color: var(--purple-light);
+  font-family: var(--font-main); font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; touch-action: manipulation;
+}
 </style>
 </head>
 <body>
@@ -1843,6 +1996,293 @@ window.addEventListener('orientationchange', function() {
     resizeCanvas('g1CanvasPinyin');
   }, 300);
 });
+
+/* ============================================================
+   ADMIN PANEL — OCR Word List Updater
+   Uses Claude Vision API to read a worksheet photo,
+   then lets the owner verify/edit before loading into game.
+============================================================ */
+var admImgBase64 = null;
+var admImgMime   = null;
+
+function openAdmin() {
+  // Pre-fill label with current header text
+  var sub = document.querySelector('.header-sub');
+  document.getElementById('admLesson').value = sub ? sub.textContent : '';
+  admShowState('admUpload');
+  document.getElementById('adminOverlay').classList.add('open');
+}
+
+function closeAdmin() {
+  document.getElementById('adminOverlay').classList.remove('open');
+}
+
+function admShowState(id) {
+  ['admUpload','admScan','admReview'].forEach(function(s) {
+    var el = document.getElementById(s);
+    if (el) {
+      if (s === id) el.classList.add('adm-active');
+      else          el.classList.remove('adm-active');
+    }
+  });
+}
+
+/* ---- File upload ---- */
+function admHandleFile(file) {
+  if (!file) return;
+  admImgMime = file.type || 'image/jpeg';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var dataUrl = e.target.result;
+    var preview = document.getElementById('admPreview');
+    preview.src = dataUrl;
+    preview.style.display = 'block';
+    admImgBase64 = dataUrl.split(',')[1];
+    document.getElementById('admScanBtn').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ---- Resize before sending to reduce payload ---- */
+function admResizeImage(base64, mime, maxDim) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() {
+      var w = img.width, h = img.height;
+      if (w <= maxDim && h <= maxDim) { resolve({ base64: base64, mime: mime }); return; }
+      var scale = maxDim / Math.max(w, h);
+      var cv = document.createElement('canvas');
+      cv.width  = Math.round(w * scale);
+      cv.height = Math.round(h * scale);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      resolve({ base64: cv.toDataURL('image/jpeg', 0.88).split(',')[1], mime: 'image/jpeg' });
+    };
+    img.onerror = function() { resolve({ base64: base64, mime: mime }); };
+    img.src = 'data:' + mime + ';base64,' + base64;
+  });
+}
+
+/* ---- Start scan ---- */
+async function admStartScan() {
+  if (!admImgBase64) return;
+  admShowState('admScan');
+  document.getElementById('admErr').classList.remove('show');
+  try {
+    var img   = await admResizeImage(admImgBase64, admImgMime, 1600);
+    var result = await admRunOCR(img.base64, img.mime);
+    admShowReview(result);
+  } catch (err) {
+    admShowState('admReview');
+    document.getElementById('admErr').textContent = '❌ ' + (err.message || String(err));
+    document.getElementById('admErr').classList.add('show');
+    // Render empty tables so user can type manually
+    admFillRows('admWordsRows', []);
+    admFillRows('admRecogRows', []);
+  }
+}
+
+/* ---- Claude Vision API call ---- */
+async function admRunOCR(base64, mime) {
+  var prompt =
+    'This is a Chinese Primary 1 school spelling worksheet.\n' +
+    'Extract the two word lists:\n' +
+    '  • 我会写 (left column): characters the student must write from dictation\n' +
+    '  • 我会认 (right column): recognition-only words\n' +
+    'For EVERY word include the Chinese character(s) AND the pinyin with correct tone marks.\n' +
+    'Return ONLY valid JSON — no markdown, no explanation:\n' +
+    '{"lessonName":"第X课","words":[{"char":"字","pinyin":"zì"}],"recog":[{"char":"字","pinyin":"zì"}]}';
+
+  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mime, data: base64 } },
+          { type: 'text',  text: prompt }
+        ]
+      }]
+    })
+  });
+
+  if (!resp.ok) {
+    var errText = await resp.text();
+    throw new Error('API error ' + resp.status + ': ' + errText.substring(0, 160));
+  }
+
+  var data = await resp.json();
+  var text = (data.content || [])
+    .filter(function(b) { return b.type === 'text'; })
+    .map(function(b)    { return b.text; })
+    .join('');
+
+  // Strip accidental markdown fences
+  text = text.replace(/```json/gi,'').replace(/```/g,'').trim();
+  return JSON.parse(text);
+}
+
+/* ---- Show editable review tables ---- */
+function admShowReview(data) {
+  if (data && data.lessonName) {
+    var cur = document.getElementById('admLesson').value.trim();
+    if (!cur) document.getElementById('admLesson').value = data.lessonName;
+  }
+  admFillRows('admWordsRows', (data && data.words) ? data.words : []);
+  admFillRows('admRecogRows', (data && data.recog) ? data.recog : []);
+  document.getElementById('admErr').classList.remove('show');
+  admShowState('admReview');
+}
+
+function admFillRows(containerId, list) {
+  var el = document.getElementById(containerId);
+  el.innerHTML = '';
+  list.forEach(function(w) { el.appendChild(admMakeRow(w.char || '', w.pinyin || '')); });
+}
+
+function admMakeRow(char, pinyin) {
+  var div = document.createElement('div');
+  div.className = 'adm-row';
+  div.innerHTML =
+    '<input class="adm-char-inp" type="text" value="' + admEsc(char)   + '" placeholder="字">' +
+    '<input class="adm-pin-inp"  type="text" value="' + admEsc(pinyin) + '" placeholder="pīn">' +
+    '<button class="adm-del" onclick="this.parentElement.remove()">✕</button>';
+  return div;
+}
+
+function admAddRow(containerId) {
+  document.getElementById(containerId).appendChild(admMakeRow('',''));
+}
+
+function admEsc(s) { return (s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+function admGoBack() {
+  document.getElementById('admErr').classList.remove('show');
+  admShowState('admUpload');
+}
+
+/* ---- Read rows and load into game ---- */
+function admReadRows(containerId) {
+  var rows = document.querySelectorAll('#' + containerId + ' .adm-row');
+  var out = [];
+  rows.forEach(function(row) {
+    var c = row.querySelector('.adm-char-inp').value.trim();
+    var p = row.querySelector('.adm-pin-inp').value.trim();
+    if (c) out.push({ char: c, pinyin: p });
+  });
+  return out;
+}
+
+function admLoadIntoGame() {
+  var newWords = admReadRows('admWordsRows');
+  var newRecog = admReadRows('admRecogRows');
+  var errEl    = document.getElementById('admErr');
+
+  if (newWords.length === 0 || newRecog.length === 0) {
+    errEl.textContent = '⚠️ Both columns need at least one word.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  // Update global word data
+  words = newWords;
+  recog = newRecog;
+
+  // Update header subtitle
+  var lessonLabel = document.getElementById('admLesson').value.trim();
+  if (lessonLabel) document.querySelector('.header-sub').textContent = lessonLabel;
+
+  // Recalculate gem thresholds for new word counts
+  var maxPts = words.length * 2 + recog.length;
+  GEM_THRESHOLDS = [];
+  for (var i = 1; i <= 7; i++) {
+    GEM_THRESHOLDS.push(Math.round(maxPts * i / 7));
+  }
+  GEM_THRESHOLDS[6] = maxPts; // last gem = perfect
+
+  // Reset scores
+  totalScore = 0;
+  g2Score    = 0;
+  g3Score    = 0;
+
+  // Reinitialise all games with new data
+  g1Init();
+  g2Init();
+  g3Init();
+
+  // Update score display
+  document.getElementById('scoreDisplay').textContent = '0 / ' + maxPts + ' pts';
+  updateScore();
+
+  closeAdmin();
+  switchTab('g1');
+  confettiBurst(18);
+}
 </script>
+<!-- Admin trigger (small, discreet — tap 3× or find at bottom-right) -->
+<button class="admin-trigger" id="adminTrigger" onclick="openAdmin()" title="Admin">⚙️</button>
+
+<!-- Admin overlay modal -->
+<div class="admin-overlay" id="adminOverlay">
+<div class="admin-panel">
+
+  <div class="admin-hdr">
+    <div class="admin-hdr-title">⚙️ Admin — Update Word List</div>
+    <button class="admin-close-btn" onclick="closeAdmin()">✕</button>
+  </div>
+
+  <!-- STATE 1: UPLOAD -->
+  <div class="adm-state adm-active" id="admUpload">
+    <label class="adm-label">Lesson / Date label (shown in app header)</label>
+    <input type="text" class="adm-text-input" id="admLesson" placeholder="e.g. 第十四课 · 8月11日">
+
+    <div class="adm-upload-zone" onclick="document.getElementById('admFileInput').click()" id="admZone">
+      <span class="adm-upload-icon">📷</span>
+      <div class="adm-upload-text">Tap to upload worksheet photo</div>
+      <div class="adm-upload-sub">JPG or PNG · screenshot or camera</div>
+    </div>
+    <input type="file" id="admFileInput" accept="image/*" style="display:none" onchange="admHandleFile(this.files[0])">
+
+    <img id="admPreview" class="adm-preview" alt="Preview">
+
+    <button class="btn-action btn-primary" id="admScanBtn" style="display:none" onclick="admStartScan()">
+      🔍 Scan with AI
+    </button>
+  </div>
+
+  <!-- STATE 2: SCANNING -->
+  <div class="adm-state" id="admScan">
+    <div class="adm-spin-wrap">
+      <span class="adm-spin-icon">🔍</span>
+      <div class="adm-spin-text">AI is reading the worksheet…</div>
+    </div>
+  </div>
+
+  <!-- STATE 3: REVIEW & EDIT -->
+  <div class="adm-state" id="admReview">
+    <div class="adm-err" id="admErr"></div>
+
+    <div class="adm-tables">
+      <div>
+        <div class="adm-col-hdr">✍️ 我会写</div>
+        <div id="admWordsRows"></div>
+        <button class="adm-add" onclick="admAddRow('admWordsRows')">＋ Add row</button>
+      </div>
+      <div>
+        <div class="adm-col-hdr">🔢 我会认</div>
+        <div id="admRecogRows"></div>
+        <button class="adm-add" onclick="admAddRow('admRecogRows')">＋ Add row</button>
+      </div>
+    </div>
+
+    <button class="adm-load-btn" onclick="admLoadIntoGame()">✅ Load into Game</button>
+    <button class="adm-back-btn" onclick="admGoBack()">← Scan Again</button>
+  </div>
+
+</div>
+</div>
+
 </body>
 </html>
