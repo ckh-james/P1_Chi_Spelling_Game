@@ -408,57 +408,106 @@ canvas {
 .g1-dot.current      { background: var(--purple-bright); border-color: white; transform: scale(1.4); }
 .g1-counter { font-size: 0.8rem; color: var(--purple-light); font-weight: 700; }
 
-/* ===== GAME 2 — PINYIN FILL ===== */
-.sentence-display {
-  font-family: var(--font-chinese);
-  font-size: 1.6rem;
-  color: var(--gold-light);
-  text-align: center;
-  margin: 10px 0;
-  letter-spacing: 2px;
-  line-height: 1.6;
-}
-.blanks-area {
+/* ===== GAME 2 — FLIP & MATCH ===== */
+.g2-info-bar {
+  display: -webkit-flex;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin: 14px 0;
-}
-.blank-group {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
-.blank-label {
-  font-size: 0.68rem;
-  color: var(--purple-light);
-  font-weight: 700;
+.g2-stat {
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(168,85,247,0.2);
+  border-radius: 12px;
+  padding: 6px 14px;
   text-align: center;
-  max-width: 100px;
+  min-width: 70px;
 }
-.pinyin-input {
-  width: 110px;
-  background: rgba(255,255,255,0.1);
-  border: 2px solid rgba(168,85,247,0.5);
-  border-radius: 10px;
-  color: white;
-  font-family: var(--font-main);
-  font-size: 0.9rem;
-  font-weight: 700;
-  padding: 9px 10px;
+.g2-stat-label { font-size: 0.62rem; color: var(--purple-light); font-weight: 700; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+.g2-stat-val   { font-size: 1.05rem; font-weight: 900; color: var(--gold); display: block; }
+.g2-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+/* --- Flip card --- */
+.fcard {
+  position: relative;
+  height: 88px;
+  border-radius: 13px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  border: 2px solid rgba(168,85,247,0.35);
+  overflow: hidden;
+  transition: transform 0.12s;
+}
+.fcard:active:not(.matched):not(.no-tap) { transform: scale(0.88); }
+.fcard-face {
+  position: absolute;
+  inset: 0;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  padding: 5px 4px;
+  gap: 3px;
+  border-radius: 11px;
+  transition: opacity 0.18s ease;
+}
+.fcard-down {
+  background: linear-gradient(145deg, #3b1070, #6b21a8);
+  opacity: 1;
+}
+.fcard-up { opacity: 0; }
+.fcard.flipped .fcard-down { opacity: 0; }
+.fcard.flipped .fcard-up   { opacity: 1; }
+.fcard-down-icon { font-size: 1.4rem; line-height: 1; }
+.fcard-char-text {
+  font-family: var(--font-chinese);
+  font-size: 1.35rem;
+  font-size: clamp(0.9rem, 5vw, 1.35rem);
+  color: var(--gold);
+  line-height: 1.2;
   text-align: center;
-  outline: none;
-  transition: border-color 0.2s;
-  -webkit-appearance: none;
+  word-break: break-all;
 }
-.pinyin-input:focus { border-color: var(--purple-bright); background: rgba(255,255,255,0.15); }
-.pinyin-input.correct { border-color: var(--green-ok); background: rgba(34,197,94,0.15); color: var(--green-ok); }
-.pinyin-input.wrong   { border-color: var(--red-err); background: rgba(239,68,68,0.15); color: var(--red-err); }
-.pinyin-correct-ans   { font-size: 0.72rem; color: var(--green-ok); font-weight: 700; text-align: center; margin-top: 2px; display: none; }
-.pinyin-correct-ans.show { display: block; }
-.g2-score-msg { text-align: center; font-size: 0.9rem; font-weight: 700; color: var(--gold); margin-top: 10px; min-height: 22px; }
+.fcard-pinyin-text {
+  font-size: 0.75rem;
+  font-size: clamp(0.55rem, 2.4vw, 0.75rem);
+  color: var(--teal);
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
+  word-break: break-all;
+}
+.fcard-up-char {
+  background: linear-gradient(145deg, rgba(45,10,80,0.97), rgba(80,25,120,0.97));
+  border: 2px solid rgba(251,191,36,0.5);
+}
+.fcard-up-pinyin {
+  background: linear-gradient(145deg, rgba(8,32,60,0.97), rgba(12,52,90,0.97));
+  border: 2px solid rgba(45,212,191,0.5);
+}
+.fcard.matched { border-color: var(--green-ok); cursor: default; }
+.fcard.matched .fcard-up {
+  border-color: var(--green-ok) !important;
+  background: linear-gradient(145deg, rgba(10,50,25,0.97), rgba(20,80,40,0.97)) !important;
+}
+.fcard.mismatch { animation: fShake 0.38s ease; }
+@keyframes fShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+/* --- Done panel --- */
+.g2-done-panel { display: none; text-align: center; padding: 16px 10px 8px; }
+.g2-done-panel.visible { display: block; }
+.g2-done-stars { font-size: 2rem; margin-bottom: 8px; letter-spacing: 3px; }
+.g2-done-msg   { font-size: 1rem; font-weight: 800; color: var(--gold); margin-bottom: 5px; }
+.g2-done-sub   { font-size: 0.8rem; color: var(--purple-light); margin-bottom: 14px; }
 
 /* ===== GAME 3 — 我会认 ===== */
 .g3-call-area {
@@ -699,13 +748,37 @@ canvas {
   100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
 }
 
-/* ===== TTS STATUS ===== */
-.tts-status {
-  text-align: center;
-  font-size: 0.7rem;
-  color: rgba(168,85,247,0.6);
-  padding: 2px 0 6px;
+/* ===== TTS STATUS BAR ===== */
+.tts-status-bar {
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px 12px 6px;
+  flex-wrap: wrap;
 }
+#ttsStatus {
+  font-size: 0.7rem;
+  color: rgba(168,85,247,0.7);
+  font-family: var(--font-main);
+}
+.tts-test-btn {
+  background: rgba(168,85,247,0.15);
+  border: 1.5px solid rgba(168,85,247,0.4);
+  border-radius: 20px;
+  color: var(--purple-light);
+  font-family: var(--font-main);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.tts-test-btn:active { background: rgba(168,85,247,0.35); }
+.tts-test-btn.ok  { border-color: var(--green-ok); color: var(--green-ok); }
+.tts-test-btn.err { border-color: var(--red-err);  color: #fca5a5; }
 
 /* ===== UTILITY ===== */
 .hidden { display: none !important; }
@@ -730,11 +803,14 @@ canvas {
   <div class="header">
     <div class="header-crown">👑</div>
     <div class="header-title">Princess Spelling Kingdom</div>
-    <div class="header-sub">听写练习 · Spelling Practice</div>
+    <div class="header-sub">第十三课 · 8月4日（星期二）</div>
   </div>
 
-  <!-- TTS STATUS -->
-  <div class="tts-status" id="ttsStatus">🔈 Loading voices…</div>
+  <!-- TTS STATUS BAR -->
+  <div class="tts-status-bar" id="ttsStatusBar">
+    <span id="ttsStatus">🔈 Loading voices…</span>
+    <button class="tts-test-btn" onclick="ttsTestSound()">🔊 Test Sound</button>
+  </div>
 
   <!-- GEM SCORE BAR -->
   <div class="score-bar">
@@ -752,7 +828,7 @@ canvas {
   <!-- TAB BAR -->
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('g1')" id="tab-g1">✍️ 我会写</button>
-    <button class="tab-btn" onclick="switchTab('g2')" id="tab-g2">🏰 填拼音</button>
+    <button class="tab-btn" onclick="switchTab('g2')" id="tab-g2">🃏 翻牌配对</button>
     <button class="tab-btn" onclick="switchTab('g3')" id="tab-g3">🔢 我会认</button>
   </div>
 
@@ -840,19 +916,38 @@ canvas {
 
 
   <!-- ===================================== -->
-  <!-- GAME 2: Sentence Pinyin Fill         -->
+  <!-- GAME 2: 翻牌 Flip & Match            -->
   <!-- ===================================== -->
   <div class="game-panel" id="g2">
 
-    <div class="section-hdr">🏰 Sentence Practice</div>
+    <div class="section-hdr">🃏 翻牌配对 Flip &amp; Match</div>
 
-    <div class="card" style="text-align:center; padding:32px 20px;">
-      <div style="font-size:2.8rem; margin-bottom:14px;">📝</div>
-      <div style="font-size:1rem; font-weight:800; color:var(--gold); margin-bottom:10px;">No Sentence This Week</div>
-      <div style="font-size:0.85rem; color:var(--purple-light); line-height:1.6;">
-        第十一课 does not have a<br>sentence 听写 exercise.<br><br>
-        Practice <strong style="color:var(--purple-light);">我会写</strong> and <strong style="color:var(--purple-light);">我会认</strong><br>using the other two tabs! 🌟
+    <div class="card">
+
+      <!-- Info bar -->
+      <div class="g2-info-bar">
+        <div class="g2-stat">
+          <span class="g2-stat-label">Pairs</span>
+          <span class="g2-stat-val" id="g2PairsStat">0 / 6</span>
+        </div>
+        <div class="g2-stat">
+          <span class="g2-stat-label">Tries</span>
+          <span class="g2-stat-val" id="g2TriesStat">0</span>
+        </div>
+        <button class="btn-audio" style="font-size:0.78rem;padding:8px 14px;margin:0 0 0 auto;" onclick="g2NewGame()">🔀 New</button>
       </div>
+
+      <!-- Card grid (built by JS) -->
+      <div class="g2-grid" id="g2Grid"></div>
+
+      <!-- Done panel -->
+      <div class="g2-done-panel" id="g2DonePanel">
+        <div class="g2-done-stars" id="g2DoneStars"></div>
+        <div class="g2-done-msg"   id="g2DoneMsg2"></div>
+        <div class="g2-done-sub"   id="g2DoneSub"></div>
+        <button class="btn-action btn-primary" onclick="g2NewGame()">🔀 Play Again</button>
+      </div>
+
     </div>
 
   </div><!-- end g2 -->
@@ -896,31 +991,31 @@ canvas {
    LESSON DATA
 ============================================================ */
 var words = [
-  { char: '吃',    pinyin: 'chī' },
-  { char: '米',    pinyin: 'mǐ' },
-  { char: '虫子',  pinyin: 'chóng zi' },
-  { char: '今天',  pinyin: 'jīn tiān' },
-  { char: '包子',  pinyin: 'bāo zi' },
-  { char: '半个',  pinyin: 'bàn gè' },
-  { char: '两元',  pinyin: 'liǎng yuán' },
-  { char: '豆子',  pinyin: 'dòu zi' },
-  { char: '肉干',  pinyin: 'ròu gān' },
-  { char: '几个',  pinyin: 'jǐ gè' },
-  { char: '可开心了', pinyin: 'kě kāi xīn le' }
+  { char: '用',   pinyin: 'yòng' },
+  { char: '牙',   pinyin: 'yá' },
+  { char: '要',   pinyin: 'yào' },
+  { char: '毛巾', pinyin: 'máo jīn' },
+  { char: '以后', pinyin: 'yǐ hòu' },
+  { char: '东西', pinyin: 'dōng xi' },
+  { char: '下雨', pinyin: 'xià yǔ' },
+  { char: '马上', pinyin: 'mǎ shàng' },
+  { char: '四点', pinyin: 'sì diǎn' },
+  { char: '来了', pinyin: 'lái le' },
+  { char: '书包', pinyin: 'shū bāo' }
 ];
 
 var recog = [
-  { char: '饼',    pinyin: 'bǐng' },
-  { char: '鸭饭',  pinyin: 'yā fàn' },
-  { char: '鸡蛋',  pinyin: 'jī dàn' },
-  { char: '饿了',  pinyin: 'è le' },
-  { char: '饱了',  pinyin: 'bǎo le' },
-  { char: '唱歌',  pinyin: 'chàng gē' },
-  { char: '小狗',  pinyin: 'xiǎo gǒu' },
-  { char: '喜欢',  pinyin: 'xǐ huān' },
-  { char: '小猫',  pinyin: 'xiǎo māo' },
-  { char: '采果子', pinyin: 'cǎi guǒ zi' },
-  { char: '青菜汤好香', pinyin: 'qīng cài tāng hǎo xiāng' }
+  { char: '刷',    pinyin: 'shuā' },
+  { char: '先',    pinyin: 'xiān' },
+  { char: '请',    pinyin: 'qǐng' },
+  { char: '变',    pinyin: 'biàn' },
+  { char: '抹干',  pinyin: 'mǒ gān' },
+  { char: '洗脸',  pinyin: 'xǐ liǎn' },
+  { char: '放下',  pinyin: 'fàng xià' },
+  { char: '冲凉',  pinyin: 'chōng liáng' },
+  { char: '谢谢',  pinyin: 'xiè xie' },
+  { char: '回到家', pinyin: 'huí dào jiā' },
+  { char: '很多泡泡', pinyin: 'hěn duō pào pào' }
 ];
 
 // G2 (sentence practice) not used for this lesson
@@ -944,34 +1039,81 @@ var g3Score = 0;               // 0-11
 var ttsVoice = null;
 var ttsReady = false;
 
-function initTTS() {
-  if (!window.speechSynthesis) {
-    document.getElementById('ttsStatus').textContent = '⚠️ TTS not available on this browser';
+function selectBestVoice(voices) {
+  // Prefer zh-CN / zh-TW / cmn voices; within those prefer female names
+  var zh = voices.filter(function(v) {
+    return v.lang && (v.lang.indexOf('zh') === 0 || v.lang.indexOf('cmn') === 0);
+  });
+  var female = zh.filter(function(v) {
+    return /female|tingting|meijia|xiaoxiao|huihui|yaoyao|xiaoyan/i.test(v.name);
+  });
+  return female[0] || zh[0] || null;
+}
+
+function updateTTSStatus(voice, error) {
+  var statusEl  = document.getElementById('ttsStatus');
+  var testBtn   = document.querySelector('.tts-test-btn');
+  if (error) {
+    statusEl.textContent = '⚠️ ' + error;
+    if (testBtn) { testBtn.classList.add('err'); testBtn.classList.remove('ok'); }
     return;
   }
-  function loadVoices() {
+  if (voice) {
+    statusEl.textContent = '🎙️ ' + voice.name.substring(0, 26);
+  } else {
+    statusEl.textContent = '🔈 Default voice (no zh-CN found)';
+  }
+}
+
+function initTTS() {
+  if (!window.speechSynthesis) {
+    updateTTSStatus(null, 'TTS not supported on this browser');
+    return;
+  }
+
+  function tryLoad() {
     var voices = window.speechSynthesis.getVoices();
-    // Prefer zh-CN female voices
-    var preferred = voices.filter(function(v) {
-      return v.lang && v.lang.indexOf('zh') >= 0;
-    });
-    // Try to pick female
-    var female = preferred.filter(function(v) {
-      return /female|tingting|meijia|microsoft huihui|microsoft yaoyao/i.test(v.name);
-    });
-    ttsVoice = female[0] || preferred[0] || null;
+    if (voices.length === 0) return false;
+    ttsVoice = selectBestVoice(voices);
     ttsReady = true;
-    var statusEl = document.getElementById('ttsStatus');
-    if (ttsVoice) {
-      statusEl.textContent = '🎙️ Voice: ' + ttsVoice.name.substring(0, 28);
-    } else {
-      statusEl.textContent = '🔈 TTS ready (default voice)';
-    }
+    updateTTSStatus(ttsVoice, null);
+    return true;
   }
-  if (window.speechSynthesis.getVoices().length > 0) {
-    loadVoices();
+
+  // 1) Try synchronously (desktop Chrome, Firefox)
+  if (!tryLoad()) {
+    // 2) onvoiceschanged (fires on many browsers)
+    window.speechSynthesis.onvoiceschanged = function() { tryLoad(); };
+
+    // 3) Polling fallback (Android Chrome often needs this)
+    var pollCount = 0;
+    var poll = setInterval(function() {
+      pollCount++;
+      if (tryLoad() || pollCount >= 20) {
+        clearInterval(poll);
+        if (!ttsReady) updateTTSStatus(null, 'No voices loaded — sound may not work');
+      }
+    }, 250);
   }
-  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function ttsTestSound() {
+  var btn = document.querySelector('.tts-test-btn');
+  if (!window.speechSynthesis) {
+    if (btn) { btn.textContent = '❌ Not supported'; btn.classList.add('err'); }
+    return;
+  }
+  if (btn) btn.textContent = '⏳ Testing…';
+  var worked = false;
+  speakChinese('你好', function() {
+    worked = true;
+    if (btn) { btn.textContent = '✅ Sound OK'; btn.classList.add('ok'); btn.classList.remove('err'); }
+    setTimeout(function() { if (btn) btn.textContent = '🔊 Test Sound'; }, 2500);
+  });
+  // If onend never fires within 4 s, assume failure
+  setTimeout(function() {
+    if (!worked && btn) { btn.textContent = '❌ No sound'; btn.classList.add('err'); btn.classList.remove('ok'); }
+  }, 4000);
 }
 
 function speakChinese(text, onEnd) {
@@ -979,17 +1121,32 @@ function speakChinese(text, onEnd) {
     if (onEnd) onEnd();
     return;
   }
-  // Cancel any ongoing speech
-  window.speechSynthesis.cancel();
-  var utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'zh-CN';
-  utter.rate = 0.82;
-  utter.pitch = 1.1;
-  utter.volume = 1.0;
-  if (ttsVoice) utter.voice = ttsVoice;
-  if (onEnd) utter.onend = onEnd;
-  utter.onerror = function() { if (onEnd) onEnd(); };
-  window.speechSynthesis.speak(utter);
+  try {
+    // Cancel first — but MUST wait before speaking or Chrome Android drops it
+    window.speechSynthesis.cancel();
+    setTimeout(function() {
+      try {
+        var utter = new SpeechSynthesisUtterance(text);
+        utter.lang   = 'zh-CN';
+        utter.rate   = 0.82;
+        utter.pitch  = 1.1;
+        utter.volume = 1.0;
+        if (ttsVoice) utter.voice = ttsVoice;
+        utter.onend   = function() { if (onEnd) onEnd(); };
+        utter.onerror = function(e) {
+          console.warn('TTS error:', e && e.error ? e.error : e);
+          if (onEnd) onEnd();
+        };
+        window.speechSynthesis.speak(utter);
+      } catch (e2) {
+        console.warn('TTS speak() threw:', e2);
+        if (onEnd) onEnd();
+      }
+    }, 50); // 50 ms gap: fixes Chrome Android cancel→speak race condition
+  } catch (e) {
+    console.warn('TTS cancel() threw:', e);
+    if (onEnd) onEnd();
+  }
 }
 
 // Workaround for iOS/Android WebView: resume synthesis if paused by OS
@@ -1395,9 +1552,149 @@ function resetG1() {
 /* ============================================================
    GAME 2: Sentence Pinyin Fill — stubbed (no sentence Lesson 11)
 ============================================================ */
-function g2Play()  { /* no sentence this lesson */ }
-function g2Check() { /* no sentence this lesson */ }
-function resetG2() { /* no sentence this lesson */ }
+/* ============================================================
+   GAME 2: 翻牌配对 Flip & Match
+   Draws 6 pairs from the combined words+recog pool each round.
+   Each pair = one character card + one pinyin card.
+============================================================ */
+var G2_PAIRS     = 6;
+var g2Cards      = [];   // { word, type:'char'|'pinyin', flipped, matched }
+var g2FirstIdx   = -1;   // index of first revealed card (-1 = none)
+var g2Locked     = false; // board locked while evaluating a pair
+var g2Tries      = 0;
+var g2MatchCount = 0;
+
+function g2Init() { g2NewGame(); }
+
+function g2NewGame() {
+  // Build combined pool, shuffle, pick G2_PAIRS words
+  var pool = [];
+  for (var i = 0; i < words.length; i++) pool.push(words[i]);
+  for (var j = 0; j < recog.length; j++) pool.push(recog[j]);
+  for (var s = pool.length - 1; s > 0; s--) {
+    var r = Math.floor(Math.random() * (s + 1));
+    var t = pool[s]; pool[s] = pool[r]; pool[r] = t;
+  }
+  var chosen = pool.slice(0, G2_PAIRS);
+
+  // Build card list: char + pinyin per word, then shuffle
+  var list = [];
+  for (var k = 0; k < chosen.length; k++) {
+    list.push({ word: chosen[k], type: 'char',   flipped: false, matched: false });
+    list.push({ word: chosen[k], type: 'pinyin', flipped: false, matched: false });
+  }
+  for (var m = list.length - 1; m > 0; m--) {
+    var n = Math.floor(Math.random() * (m + 1));
+    var tm = list[m]; list[m] = list[n]; list[n] = tm;
+  }
+  g2Cards      = list;
+  g2FirstIdx   = -1;
+  g2Locked     = false;
+  g2Tries      = 0;
+  g2MatchCount = 0;
+
+  document.getElementById('g2PairsStat').textContent = '0 / ' + G2_PAIRS;
+  document.getElementById('g2TriesStat').textContent = '0';
+  document.getElementById('g2DonePanel').classList.remove('visible');
+  g2RenderGrid();
+}
+
+function g2RenderGrid() {
+  var html = '';
+  for (var i = 0; i < g2Cards.length; i++) {
+    html += '<div class="fcard" id="fc'+i+'" onclick="g2Tap('+i+')">'
+          +   '<div class="fcard-face fcard-down"><div class="fcard-down-icon">✨</div></div>'
+          +   g2FaceHTML(g2Cards[i])
+          + '</div>';
+  }
+  document.getElementById('g2Grid').innerHTML = html;
+}
+
+function g2FaceHTML(card) {
+  if (card.type === 'char') {
+    return '<div class="fcard-face fcard-up fcard-up-char">'
+         + '<div class="fcard-char-text">' + card.word.char + '</div>'
+         + '</div>';
+  }
+  return '<div class="fcard-face fcard-up fcard-up-pinyin">'
+       + '<div class="fcard-pinyin-text">' + card.word.pinyin + '</div>'
+       + '</div>';
+}
+
+function g2Tap(idx) {
+  if (g2Locked) return;
+  var card = g2Cards[idx];
+  if (card.flipped || card.matched) return;
+  if (idx === g2FirstIdx) return; // tapped same card twice
+
+  // Flip card face-up
+  card.flipped = true;
+  document.getElementById('fc' + idx).classList.add('flipped');
+
+  // Speak on character reveal
+  if (card.type === 'char') speakChinese(card.word.char, null);
+
+  if (g2FirstIdx === -1) {
+    g2FirstIdx = idx;   // wait for second tap
+    return;
+  }
+
+  // --- Second card tapped: evaluate ---
+  var firstCard = g2Cards[g2FirstIdx];
+  var firstIdx  = g2FirstIdx;
+  g2Tries++;
+  document.getElementById('g2TriesStat').textContent = g2Tries;
+  g2Locked   = true;
+  g2FirstIdx = -1;
+
+  if (firstCard.word === card.word && firstCard.type !== card.type) {
+    // ✅ Matched pair
+    card.matched      = true;
+    firstCard.matched = true;
+    g2MatchCount++;
+    document.getElementById('g2PairsStat').textContent = g2MatchCount + ' / ' + G2_PAIRS;
+    speakChinese(card.word.char, null);
+    setTimeout(function() {
+      document.getElementById('fc' + firstIdx).classList.add('matched', 'no-tap');
+      document.getElementById('fc' + idx).classList.add('matched', 'no-tap');
+      g2Locked = false;
+      if (g2MatchCount === G2_PAIRS) {
+        setTimeout(g2ShowDone, 300);
+      }
+    }, 350);
+
+  } else {
+    // ❌ No match — shake then flip back
+    var saveFirst = firstIdx, saveSecond = idx;
+    setTimeout(function() {
+      var elA = document.getElementById('fc' + saveFirst);
+      var elB = document.getElementById('fc' + saveSecond);
+      if (elA) elA.classList.add('mismatch');
+      if (elB) elB.classList.add('mismatch');
+      setTimeout(function() {
+        if (elA) { elA.classList.remove('flipped', 'mismatch'); }
+        if (elB) { elB.classList.remove('flipped', 'mismatch'); }
+        g2Cards[saveFirst].flipped  = false;
+        g2Cards[saveSecond].flipped = false;
+        g2Locked = false;
+      }, 420);
+    }, 480);
+  }
+}
+
+function g2ShowDone() {
+  var stars, msg, sub;
+  if      (g2Tries <= 7)  { stars='⭐⭐⭐'; msg='Amazing Memory! 👑';    sub='Only '+g2Tries+' tries — incredible!'; }
+  else if (g2Tries <= 11) { stars='⭐⭐';   msg='Great Job! 🌟';          sub=g2Tries+' tries — well done!'; }
+  else                    { stars='⭐';     msg='Keep Practising! 🌸';   sub=g2Tries+' tries — you\'ll get there!'; }
+  document.getElementById('g2DoneStars').textContent = stars;
+  document.getElementById('g2DoneMsg2').textContent  = msg;
+  document.getElementById('g2DoneSub').textContent   = sub;
+  document.getElementById('g2DonePanel').classList.add('visible');
+  confettiBurst(22);
+}
+
+function resetG2() { g2NewGame(); }
 
 /* ============================================================
    GAME 3: 我会认
@@ -1532,9 +1829,9 @@ window.addEventListener('load', function() {
   buildStars();
   initTTS();
 
-  // Delay canvas init slightly so layout is computed
   setTimeout(function() {
     g1Init();
+    g2Init();
     g3Init();
   }, 150);
 });
