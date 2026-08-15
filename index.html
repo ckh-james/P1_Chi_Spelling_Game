@@ -956,7 +956,7 @@ canvas {
   <div class="header">
     <div class="header-crown">👑</div>
     <div class="header-title">Princess Spelling Kingdom</div>
-    <div class="header-sub">第十三课 · 8月4日（星期二）</div>
+    <div class="header-sub">第十四课 · 8月18日（星期二）</div>
   </div>
 
   <!-- TTS STATUS BAR -->
@@ -1144,31 +1144,31 @@ canvas {
    LESSON DATA
 ============================================================ */
 var words = [
-  { char: '用',   pinyin: 'yòng' },
-  { char: '牙',   pinyin: 'yá' },
-  { char: '要',   pinyin: 'yào' },
-  { char: '毛巾', pinyin: 'máo jīn' },
-  { char: '以后', pinyin: 'yǐ hòu' },
-  { char: '东西', pinyin: 'dōng xi' },
-  { char: '下雨', pinyin: 'xià yǔ' },
-  { char: '马上', pinyin: 'mǎ shàng' },
-  { char: '四点', pinyin: 'sì diǎn' },
-  { char: '来了', pinyin: 'lái le' },
-  { char: '书包', pinyin: 'shū bāo' }
+  { char: '是',    pinyin: 'shì' },
+  { char: '和',    pinyin: 'hé' },
+  { char: '好',    pinyin: 'hǎo' },
+  { char: '衣',    pinyin: 'yī' },
+  { char: '尺',    pinyin: 'chǐ' },
+  { char: '皮',    pinyin: 'pí' },
+  { char: '还是',  pinyin: 'hái shì' },
+  { char: '自己',  pinyin: 'zì jǐ' },
+  { char: '一下子', pinyin: 'yī xià zi' },
+  { char: '书包里', pinyin: 'shū bāo lǐ' },
+  { char: '两个女儿', pinyin: 'liǎng gè nǚ ér' }
 ];
 
 var recog = [
-  { char: '刷',    pinyin: 'shuā' },
-  { char: '先',    pinyin: 'xiān' },
-  { char: '请',    pinyin: 'qǐng' },
-  { char: '变',    pinyin: 'biàn' },
-  { char: '抹干',  pinyin: 'mǒ gān' },
-  { char: '洗脸',  pinyin: 'xǐ liǎn' },
-  { char: '放下',  pinyin: 'fàng xià' },
-  { char: '冲凉',  pinyin: 'chōng liáng' },
-  { char: '谢谢',  pinyin: 'xiè xie' },
-  { char: '回到家', pinyin: 'huí dào jiā' },
-  { char: '很多泡泡', pinyin: 'hěn duō pào pào' }
+  { char: '都',    pinyin: 'dōu' },
+  { char: '这',    pinyin: 'zhè' },
+  { char: '穿',    pinyin: 'chuān' },
+  { char: '做事',  pinyin: 'zuò shì' },
+  { char: '被子',  pinyin: 'bèi zi' },
+  { char: '动作快', pinyin: 'dòng zuò kuài' },
+  { char: '王老师', pinyin: 'wáng lǎo shī' },
+  { char: '收拾书包', pinyin: 'shōu shi shū bāo' },
+  { char: '那件衣服', pinyin: 'nà jiàn yī fú' },
+  { char: '一双袜子', pinyin: 'yī shuāng wà zi' },
+  { char: '红色的鞋子', pinyin: 'hóng sè de xié zi' }
 ];
 
 // G2 (sentence practice) not used for this lesson
@@ -2009,6 +2009,9 @@ function openAdmin() {
   // Pre-fill label with current header text
   var sub = document.querySelector('.header-sub');
   document.getElementById('admLesson').value = sub ? sub.textContent : '';
+  // Show warning if opened as a local file (file:// blocks cross-origin fetch)
+  var isLocal = (window.location.protocol === 'file:');
+  document.getElementById('admProtocolWarn').style.display = isLocal ? 'block' : 'none';
   admShowState('admUpload');
   document.getElementById('adminOverlay').classList.add('open');
 }
@@ -2065,24 +2068,49 @@ function admResizeImage(base64, mime, maxDim) {
 /* ---- Start scan ---- */
 async function admStartScan() {
   if (!admImgBase64) return;
+
+  // Block if local file:// (CORS prevents fetch to external APIs)
+  if (window.location.protocol === 'file:') {
+    document.getElementById('admProtocolWarn').style.display = 'block';
+    return;
+  }
+
   admShowState('admScan');
   document.getElementById('admErr').classList.remove('show');
+
+  var apiKey = (document.getElementById('admApiKey').value || '').trim();
+
   try {
-    var img   = await admResizeImage(admImgBase64, admImgMime, 1600);
-    var result = await admRunOCR(img.base64, img.mime);
+    var img    = await admResizeImage(admImgBase64, admImgMime, 1600);
+    var result = await admRunOCR(img.base64, img.mime, apiKey);
     admShowReview(result);
   } catch (err) {
     admShowState('admReview');
-    document.getElementById('admErr').textContent = '❌ ' + (err.message || String(err));
+    var msg = err.message || String(err);
+    // Give actionable guidance for common errors
+    if (/401|unauthorized|api.key/i.test(msg)) {
+      msg = '❌ Invalid or missing API key. Enter your Anthropic API key above.';
+    } else if (/failed to fetch|network/i.test(msg)) {
+      msg = '❌ Network error. Check your connection, or use this inside Claude.ai.';
+    } else {
+      msg = '❌ ' + msg;
+    }
+    document.getElementById('admErr').textContent = msg;
     document.getElementById('admErr').classList.add('show');
-    // Render empty tables so user can type manually
+    // Still render empty tables so user can type manually
     admFillRows('admWordsRows', []);
     admFillRows('admRecogRows', []);
   }
 }
 
 /* ---- Claude Vision API call ---- */
-async function admRunOCR(base64, mime) {
+async function admRunOCR(base64, mime, apiKey) {
+  var headers = { 'Content-Type': 'application/json' };
+  if (apiKey) {
+    headers['x-api-key']         = apiKey;
+    headers['anthropic-version'] = '2023-06-01';
+  }
+
   var prompt =
     'This is a Chinese Primary 1 school spelling worksheet.\n' +
     'Extract the two word lists:\n' +
@@ -2094,7 +2122,7 @@ async function admRunOCR(base64, mime) {
 
   var resp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: headers,
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 1000,
@@ -2119,7 +2147,6 @@ async function admRunOCR(base64, mime) {
     .map(function(b)    { return b.text; })
     .join('');
 
-  // Strip accidental markdown fences
   text = text.replace(/```json/gi,'').replace(/```/g,'').trim();
   return JSON.parse(text);
 }
@@ -2236,7 +2263,18 @@ function admLoadIntoGame() {
   <!-- STATE 1: UPLOAD -->
   <div class="adm-state adm-active" id="admUpload">
     <label class="adm-label">Lesson / Date label (shown in app header)</label>
-    <input type="text" class="adm-text-input" id="admLesson" placeholder="e.g. 第十四课 · 8月11日">
+    <input type="text" class="adm-text-input" id="admLesson" placeholder="e.g. 第十四课 · 8月18日">
+
+    <label class="adm-label" style="margin-top:4px;">
+      Anthropic API Key
+      <span style="font-weight:400;color:rgba(168,85,247,0.5);"> — leave blank when using inside Claude.ai</span>
+    </label>
+    <input type="password" class="adm-text-input" id="admApiKey" placeholder="sk-ant-api03-…" autocomplete="off">
+
+    <div id="admProtocolWarn" style="display:none;background:rgba(251,191,36,0.1);border:1.5px solid rgba(251,191,36,0.35);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.78rem;color:var(--gold-light);line-height:1.5;">
+      ⚠️ <strong>Local file detected.</strong> OCR requires the app to be hosted online (GitHub Pages).<br>
+      Alternatively, use the admin panel <em>within Claude.ai</em> where no API key is needed.
+    </div>
 
     <div class="adm-upload-zone" onclick="document.getElementById('admFileInput').click()" id="admZone">
       <span class="adm-upload-icon">📷</span>
