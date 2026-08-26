@@ -871,7 +871,49 @@ canvas {
   -webkit-appearance: none;
 }
 .adm-text-input:focus { border-color: var(--purple-bright); }
+/* File input: visually hidden but label-activatable (display:none breaks label-for in some browsers) */
+#admFileInput {
+  display: block;
+  width: 100%;
+  margin: 6px 0 0;
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  color: var(--purple-light);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+/* Style the native file-picker button */
+#admFileInput::-webkit-file-upload-button {
+  width: 100%;
+  padding: 11px 14px;
+  background: linear-gradient(135deg, rgba(60,18,100,0.9), rgba(100,30,160,0.9));
+  border: 2px solid rgba(168,85,247,0.55);
+  border-radius: 11px;
+  color: white;
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
+  display: block;
+}
+#admFileInput::file-selector-button {
+  width: 100%;
+  padding: 11px 14px;
+  background: linear-gradient(135deg, rgba(60,18,100,0.9), rgba(100,30,160,0.9));
+  border: 2px solid rgba(168,85,247,0.55);
+  border-radius: 11px;
+  color: white;
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+/* Upload zone acts as the label */
 .adm-upload-zone {
+  display: block;
   border: 2px dashed rgba(168,85,247,0.4);
   border-radius: 16px;
   padding: 28px 16px;
@@ -882,6 +924,37 @@ canvas {
   touch-action: manipulation;
 }
 .adm-upload-zone:active { border-color: var(--purple-bright); background: rgba(168,85,247,0.07); }
+.adm-or-divider {
+  text-align: center;
+  font-size: 0.72rem;
+  color: rgba(168,85,247,0.4);
+  font-weight: 700;
+  margin: 10px 0;
+  letter-spacing: 1px;
+}
+.adm-method-title { font-size: 0.78rem; font-weight: 800; color: var(--purple-light); margin-bottom: 4px; }
+.adm-method-sub   { font-size: 0.68rem; color: rgba(168,85,247,0.5); margin-bottom: 6px; line-height: 1.5; }
+.adm-paste-box {
+  display: block;
+  width: 100%;
+  min-height: 72px;
+  background: rgba(45,212,191,0.05);
+  border: 2px dashed rgba(45,212,191,0.35);
+  border-radius: 12px;
+  color: var(--purple-light);
+  font-family: var(--font-main);
+  font-size: 0.78rem;
+  padding: 14px;
+  outline: none;
+  resize: none;
+  text-align: center;
+  line-height: 1.6;
+  -webkit-appearance: none;
+  cursor: text;
+  transition: border-color 0.2s, background 0.2s;
+}
+.adm-paste-box:focus { border-color: var(--teal); border-style: solid; background: rgba(45,212,191,0.09); color: var(--teal); }
+.adm-paste-success { border-color: var(--green-ok) !important; background: rgba(34,197,94,0.1) !important; color: var(--green-ok) !important; }
 .adm-upload-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
 .adm-upload-text { font-size: 0.88rem; color: var(--purple-light); font-weight: 700; }
 .adm-upload-sub  { font-size: 0.7rem; color: rgba(168,85,247,0.45); margin-top: 4px; }
@@ -956,7 +1029,7 @@ canvas {
   <div class="header">
     <div class="header-crown">👑</div>
     <div class="header-title">Princess Spelling Kingdom</div>
-    <div class="header-sub">第十四课 · 8月18日（星期二）</div>
+    <div class="header-sub">第十五课 · 9月1日（星期二）</div>
   </div>
 
   <!-- TTS STATUS BAR -->
@@ -1144,31 +1217,31 @@ canvas {
    LESSON DATA
 ============================================================ */
 var words = [
-  { char: '是',    pinyin: 'shì' },
-  { char: '和',    pinyin: 'hé' },
-  { char: '好',    pinyin: 'hǎo' },
-  { char: '衣',    pinyin: 'yī' },
-  { char: '尺',    pinyin: 'chǐ' },
-  { char: '皮',    pinyin: 'pí' },
-  { char: '还是',  pinyin: 'hái shì' },
-  { char: '自己',  pinyin: 'zì jǐ' },
-  { char: '一下子', pinyin: 'yī xià zi' },
-  { char: '书包里', pinyin: 'shū bāo lǐ' },
-  { char: '两个女儿', pinyin: 'liǎng gè nǚ ér' }
+  { char: '买',    pinyin: 'mǎi' },
+  { char: '它',    pinyin: 'tā' },
+  { char: '生的',  pinyin: 'shēng de' },
+  { char: '果汁',  pinyin: 'guǒ zhī' },
+  { char: '办法',  pinyin: 'bàn fǎ' },
+  { char: '看见',  pinyin: 'kàn jiàn' },
+  { char: '用刀',  pinyin: 'yòng dāo' },
+  { char: '月儿',  pinyin: 'yuè ér' },
+  { char: '天上',  pinyin: 'tiān shàng' },
+  { char: '一斤豆子', pinyin: 'yī jīn dòu zi' },
+  { char: '一只山羊', pinyin: 'yī zhī shān yáng' }
 ];
 
 var recog = [
-  { char: '都',    pinyin: 'dōu' },
-  { char: '这',    pinyin: 'zhè' },
-  { char: '穿',    pinyin: 'chuān' },
-  { char: '做事',  pinyin: 'zuò shì' },
-  { char: '被子',  pinyin: 'bèi zi' },
-  { char: '动作快', pinyin: 'dòng zuò kuài' },
-  { char: '王老师', pinyin: 'wáng lǎo shī' },
-  { char: '收拾书包', pinyin: 'shōu shi shū bāo' },
-  { char: '那件衣服', pinyin: 'nà jiàn yī fú' },
-  { char: '一双袜子', pinyin: 'yī shuāng wà zi' },
-  { char: '红色的鞋子', pinyin: 'hóng sè de xié zi' }
+  { char: '臭',    pinyin: 'chòu' },
+  { char: '喝',    pinyin: 'hē' },
+  { char: '甜',    pinyin: 'tián' },
+  { char: '拿来',  pinyin: 'ná lái' },
+  { char: '苦瓜',  pinyin: 'kǔ guā' },
+  { char: '最重',  pinyin: 'zuì zhòng' },
+  { char: '选出',  pinyin: 'xuǎn chū' },
+  { char: '串成一串', pinyin: 'chuàn chéng yī chuàn' },
+  { char: '圆圆的', pinyin: 'yuán yuán de' },
+  { char: '弯弯的', pinyin: 'wān wān de' },
+  { char: '抱不动', pinyin: 'bào bù dòng' }
 ];
 
 // G2 (sentence practice) not used for this lesson
@@ -2006,12 +2079,13 @@ var admImgBase64 = null;
 var admImgMime   = null;
 
 function openAdmin() {
-  // Pre-fill label with current header text
   var sub = document.querySelector('.header-sub');
   document.getElementById('admLesson').value = sub ? sub.textContent : '';
-  // Show warning if opened as a local file (file:// blocks cross-origin fetch)
   var isLocal = (window.location.protocol === 'file:');
   document.getElementById('admProtocolWarn').style.display = isLocal ? 'block' : 'none';
+  // Reset paste box
+  var pb = document.getElementById('admPasteBox');
+  if (pb) { pb.value = ''; pb.className = 'adm-paste-box'; }
   admShowState('admUpload');
   document.getElementById('adminOverlay').classList.add('open');
 }
@@ -2042,9 +2116,54 @@ function admHandleFile(file) {
     preview.style.display = 'block';
     admImgBase64 = dataUrl.split(',')[1];
     document.getElementById('admScanBtn').style.display = 'block';
+    // Visual feedback on paste box if that was the source
+    var pb = document.getElementById('admPasteBox');
+    if (pb && pb.classList.contains('adm-paste-box')) {
+      pb.classList.add('adm-paste-success');
+      pb.value = '✅ Photo received — tap Scan with AI';
+    }
   };
   reader.readAsDataURL(file);
 }
+
+/* ---- Paste handler (clipboard image → admHandleFile) ---- */
+function admHandlePaste(e) {
+  var cd = e.clipboardData || (e.originalEvent && e.originalEvent.clipboardData);
+  if (!cd) return;
+  // Check items first (Chrome/Android)
+  if (cd.items) {
+    for (var i = 0; i < cd.items.length; i++) {
+      if (cd.items[i].type && cd.items[i].type.indexOf('image') !== -1) {
+        e.preventDefault();
+        admHandleFile(cd.items[i].getAsFile());
+        return;
+      }
+    }
+  }
+  // Fallback: check files (some WebViews)
+  if (cd.files && cd.files.length > 0) {
+    for (var j = 0; j < cd.files.length; j++) {
+      if (cd.files[j].type.indexOf('image') !== -1) {
+        e.preventDefault();
+        admHandleFile(cd.files[j]);
+        return;
+      }
+    }
+  }
+}
+
+// Document-level paste listener: catches Ctrl+V on desktop and
+// paste events from any focused element while admin is open
+document.addEventListener('paste', function(e) {
+  if (!document.getElementById('adminOverlay').classList.contains('open')) return;
+  admHandlePaste(e);
+});
+
+// Wire paste box textarea to paste handler
+document.addEventListener('DOMContentLoaded', function() {
+  var pb = document.getElementById('admPasteBox');
+  if (pb) pb.addEventListener('paste', admHandlePaste);
+});
 
 /* ---- Resize before sending to reduce payload ---- */
 function admResizeImage(base64, mime, maxDim) {
@@ -2263,29 +2382,38 @@ function admLoadIntoGame() {
   <!-- STATE 1: UPLOAD -->
   <div class="adm-state adm-active" id="admUpload">
     <label class="adm-label">Lesson / Date label (shown in app header)</label>
-    <input type="text" class="adm-text-input" id="admLesson" placeholder="e.g. 第十四课 · 8月18日">
+    <input type="text" class="adm-text-input" id="admLesson" placeholder="e.g. 第十五课 · 9月1日">
 
     <label class="adm-label" style="margin-top:4px;">
       Anthropic API Key
-      <span style="font-weight:400;color:rgba(168,85,247,0.5);"> — leave blank when using inside Claude.ai</span>
+      <span style="font-weight:400;color:rgba(168,85,247,0.5);"> — leave blank inside Claude.ai</span>
     </label>
-    <input type="password" class="adm-text-input" id="admApiKey" placeholder="sk-ant-api03-…" autocomplete="off">
+    <input type="password" class="adm-text-input" id="admApiKey" autocomplete="off" placeholder="sk-ant-…">
 
     <div id="admProtocolWarn" style="display:none;background:rgba(251,191,36,0.1);border:1.5px solid rgba(251,191,36,0.35);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.78rem;color:var(--gold-light);line-height:1.5;">
-      ⚠️ <strong>Local file detected.</strong> OCR requires the app to be hosted online (GitHub Pages).<br>
-      Alternatively, use the admin panel <em>within Claude.ai</em> where no API key is needed.
+      ⚠️ <strong>Local file detected.</strong> OCR requires the app to be hosted online (GitHub Pages) or used inside Claude.ai.
     </div>
 
-    <div class="adm-upload-zone" onclick="document.getElementById('admFileInput').click()" id="admZone">
-      <span class="adm-upload-icon">📷</span>
-      <div class="adm-upload-text">Tap to upload worksheet photo</div>
-      <div class="adm-upload-sub">JPG or PNG · screenshot or camera</div>
+    <!-- METHOD 1: Direct file input -->
+    <div class="adm-method-title">📁 Method 1 — Choose from Gallery / Files</div>
+    <div class="adm-method-sub">Tap the button below to open your photo gallery</div>
+    <input type="file" id="admFileInput" accept="image/*" onchange="admHandleFile(this.files[0])">
+
+    <div class="adm-or-divider">— or —</div>
+
+    <!-- METHOD 2: Paste from clipboard -->
+    <div class="adm-method-title">📋 Method 2 — Paste a Copied Photo</div>
+    <div class="adm-method-sub">
+      Copy the worksheet photo from your gallery → tap the box below → long press → Paste
     </div>
-    <input type="file" id="admFileInput" accept="image/*" style="display:none" onchange="admHandleFile(this.files[0])">
+    <textarea
+      id="admPasteBox"
+      class="adm-paste-box"
+      placeholder="👆 Tap here to focus, then long press → Paste your copied photo"></textarea>
 
-    <img id="admPreview" class="adm-preview" alt="Preview">
+    <img id="admPreview" class="adm-preview" alt="Preview" style="margin-top:10px;">
 
-    <button class="btn-action btn-primary" id="admScanBtn" style="display:none" onclick="admStartScan()">
+    <button class="btn-action btn-primary" id="admScanBtn" style="display:none;margin-top:10px;" onclick="admStartScan()">
       🔍 Scan with AI
     </button>
   </div>
