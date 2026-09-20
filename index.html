@@ -1029,7 +1029,7 @@ canvas {
   <div class="header">
     <div class="header-crown">👑</div>
     <div class="header-title">Princess Spelling Kingdom</div>
-    <div class="header-sub">第十五课 · 9月1日（星期二）</div>
+    <div class="header-sub">第十六课 · 9月22日（星期二）</div>
   </div>
 
   <!-- TTS STATUS BAR -->
@@ -1217,31 +1217,31 @@ canvas {
    LESSON DATA
 ============================================================ */
 var words = [
-  { char: '买',    pinyin: 'mǎi' },
-  { char: '它',    pinyin: 'tā' },
-  { char: '生的',  pinyin: 'shēng de' },
-  { char: '果汁',  pinyin: 'guǒ zhī' },
-  { char: '办法',  pinyin: 'bàn fǎ' },
-  { char: '看见',  pinyin: 'kàn jiàn' },
-  { char: '用刀',  pinyin: 'yòng dāo' },
-  { char: '月儿',  pinyin: 'yuè ér' },
-  { char: '天上',  pinyin: 'tiān shàng' },
-  { char: '一斤豆子', pinyin: 'yī jīn dòu zi' },
-  { char: '一只山羊', pinyin: 'yī zhī shān yáng' }
+  { char: '他',    pinyin: 'tā' },
+  { char: '她',    pinyin: 'tā' },
+  { char: '会',    pinyin: 'huì' },
+  { char: '打',    pinyin: 'dǎ' },
+  { char: '和',    pinyin: 'hé' },
+  { char: '是',    pinyin: 'shì' },
+  { char: '要',    pinyin: 'yào' },
+  { char: '父母',  pinyin: 'fù mǔ' },
+  { char: '你们',  pinyin: 'nǐ men' },
+  { char: '也会',  pinyin: 'yě huì' },
+  { char: '爸爸妈妈', pinyin: 'bà ba mā ma' }
 ];
 
 var recog = [
-  { char: '臭',    pinyin: 'chòu' },
-  { char: '喝',    pinyin: 'hē' },
-  { char: '甜',    pinyin: 'tián' },
-  { char: '拿来',  pinyin: 'ná lái' },
-  { char: '苦瓜',  pinyin: 'kǔ guā' },
-  { char: '最重',  pinyin: 'zuì zhòng' },
-  { char: '选出',  pinyin: 'xuǎn chū' },
-  { char: '串成一串', pinyin: 'chuàn chéng yī chuàn' },
-  { char: '圆圆的', pinyin: 'yuán yuán de' },
-  { char: '弯弯的', pinyin: 'wān wān de' },
-  { char: '抱不动', pinyin: 'bào bù dòng' }
+  { char: '房间',   pinyin: 'fáng jiān' },
+  { char: '扫地',   pinyin: 'sǎo dì' },
+  { char: '兄弟',   pinyin: 'xiōng dì' },
+  { char: '叔叔',   pinyin: 'shū shu' },
+  { char: '写字',   pinyin: 'xiě zì' },
+  { char: '阿姨',   pinyin: 'ā yí' },
+  { char: '抹桌椅',  pinyin: 'mā zhuō yǐ' },
+  { char: '听见笑声', pinyin: 'tīng jiàn xiào shēng' },
+  { char: '做完作业', pinyin: 'zuò wán zuò yè' },
+  { char: '躲到门后', pinyin: 'duǒ dào mén hòu' },
+  { char: '把窗户抹干净', pinyin: 'bǎ chuāng hù mā gān jìng' }
 ];
 
 // G2 (sentence practice) not used for this lesson
@@ -2207,10 +2207,10 @@ async function admStartScan() {
     admShowState('admReview');
     var msg = err.message || String(err);
     // Give actionable guidance for common errors
-    if (/401|unauthorized|api.key/i.test(msg)) {
-      msg = '❌ Invalid or missing API key. Enter your Anthropic API key above.';
+    if (/401|403|api.key|invalid/i.test(msg)) {
+      msg = '❌ Invalid API key. Get a free Gemini key at aistudio.google.com and enter it above.';
     } else if (/failed to fetch|network/i.test(msg)) {
-      msg = '❌ Network error. Check your connection, or use this inside Claude.ai.';
+      msg = '❌ Network error. Check your connection. If using Claude.ai, leave the key blank.';
     } else {
       msg = '❌ ' + msg;
     }
@@ -2222,52 +2222,67 @@ async function admStartScan() {
   }
 }
 
-/* ---- Claude Vision API call ---- */
+/* ---- Google Gemini Vision API call ---- */
 async function admRunOCR(base64, mime, apiKey) {
-  var headers = { 'Content-Type': 'application/json' };
-  if (apiKey) {
-    headers['x-api-key']         = apiKey;
-    headers['anthropic-version'] = '2023-06-01';
-  }
-
   var prompt =
     'This is a Chinese Primary 1 school spelling worksheet.\n' +
     'Extract the two word lists:\n' +
-    '  • 我会写 (left column): characters the student must write from dictation\n' +
+    '  • 我会写 (left column): characters the student writes from dictation\n' +
     '  • 我会认 (right column): recognition-only words\n' +
     'For EVERY word include the Chinese character(s) AND the pinyin with correct tone marks.\n' +
     'Return ONLY valid JSON — no markdown, no explanation:\n' +
     '{"lessonName":"第X课","words":[{"char":"字","pinyin":"zì"}],"recog":[{"char":"字","pinyin":"zì"}]}';
 
-  var resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1000,
-      messages: [{
-        role: 'user',
-        content: [
+  // Use Gemini if API key provided; fall back to Anthropic auto-injection (Claude.ai context)
+  if (apiKey) {
+    // ---- Google Gemini API ----
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='
+              + encodeURIComponent(apiKey);
+    var resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [
+          { inlineData: { mimeType: mime, data: base64 } },
+          { text: prompt }
+        ]}],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 1000 }
+      })
+    });
+    if (!resp.ok) {
+      var e = await resp.text();
+      throw new Error('Gemini error ' + resp.status + ': ' + e.substring(0, 160));
+    }
+    var gData = await resp.json();
+    var gText = (((gData.candidates || [])[0] || {}).content || {}).parts;
+    var text  = gText ? gText.map(function(p){ return p.text || ''; }).join('') : '';
+    text = text.replace(/```json/gi,'').replace(/```/g,'').trim();
+    return JSON.parse(text);
+
+  } else {
+    // ---- Anthropic auto-injection (Claude.ai artifact context only) ----
+    var resp2 = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: mime, data: base64 } },
           { type: 'text',  text: prompt }
-        ]
-      }]
-    })
-  });
-
-  if (!resp.ok) {
-    var errText = await resp.text();
-    throw new Error('API error ' + resp.status + ': ' + errText.substring(0, 160));
+        ]}]
+      })
+    });
+    if (!resp2.ok) {
+      var e2 = await resp2.text();
+      throw new Error('API error ' + resp2.status + ': ' + e2.substring(0, 160));
+    }
+    var aData = await resp2.json();
+    var aText = (aData.content || []).filter(function(b){ return b.type === 'text'; })
+                                      .map(function(b){ return b.text; }).join('');
+    aText = aText.replace(/```json/gi,'').replace(/```/g,'').trim();
+    return JSON.parse(aText);
   }
-
-  var data = await resp.json();
-  var text = (data.content || [])
-    .filter(function(b) { return b.type === 'text'; })
-    .map(function(b)    { return b.text; })
-    .join('');
-
-  text = text.replace(/```json/gi,'').replace(/```/g,'').trim();
-  return JSON.parse(text);
 }
 
 /* ---- Show editable review tables ---- */
@@ -2385,10 +2400,10 @@ function admLoadIntoGame() {
     <input type="text" class="adm-text-input" id="admLesson" placeholder="e.g. 第十五课 · 9月1日">
 
     <label class="adm-label" style="margin-top:4px;">
-      Anthropic API Key
-      <span style="font-weight:400;color:rgba(168,85,247,0.5);"> — leave blank inside Claude.ai</span>
+      Google Gemini API Key
+      <span style="font-weight:400;color:rgba(168,85,247,0.5);"> — get free key at aistudio.google.com</span>
     </label>
-    <input type="password" class="adm-text-input" id="admApiKey" autocomplete="off" placeholder="sk-ant-…">
+    <input type="password" class="adm-text-input" id="admApiKey" autocomplete="off" placeholder="AIza…">
 
     <div id="admProtocolWarn" style="display:none;background:rgba(251,191,36,0.1);border:1.5px solid rgba(251,191,36,0.35);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.78rem;color:var(--gold-light);line-height:1.5;">
       ⚠️ <strong>Local file detected.</strong> OCR requires the app to be hosted online (GitHub Pages) or used inside Claude.ai.
