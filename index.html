@@ -1029,7 +1029,7 @@ canvas {
   <div class="header">
     <div class="header-crown">👑</div>
     <div class="header-title">Princess Spelling Kingdom</div>
-    <div class="header-sub">第十六课 · 9月22日（星期二）</div>
+    <div class="header-sub">第十七课 · 10月6日（星期三）</div>
   </div>
 
   <!-- TTS STATUS BAR -->
@@ -1217,31 +1217,31 @@ canvas {
    LESSON DATA
 ============================================================ */
 var words = [
-  { char: '他',    pinyin: 'tā' },
-  { char: '她',    pinyin: 'tā' },
-  { char: '会',    pinyin: 'huì' },
-  { char: '打',    pinyin: 'dǎ' },
-  { char: '和',    pinyin: 'hé' },
-  { char: '是',    pinyin: 'shì' },
-  { char: '要',    pinyin: 'yào' },
-  { char: '父母',  pinyin: 'fù mǔ' },
-  { char: '你们',  pinyin: 'nǐ men' },
-  { char: '也会',  pinyin: 'yě huì' },
+  { char: '给',    pinyin: 'gěi' },
+  { char: '在',    pinyin: 'zài' },
+  { char: '昨天',  pinyin: 'zuó tiān' },
+  { char: '明天',  pinyin: 'míng tiān' },
+  { char: '快乐',  pinyin: 'kuài lè' },
+  { char: '每天',  pinyin: 'měi tiān' },
+  { char: '没有',  pinyin: 'méi yǒu' },
+  { char: '老师',  pinyin: 'lǎo shī' },
+  { char: '今天',  pinyin: 'jīn tiān' },
+  { char: '这本书', pinyin: 'zhè běn shū' },
   { char: '爸爸妈妈', pinyin: 'bà ba mā ma' }
 ];
 
 var recog = [
-  { char: '房间',   pinyin: 'fáng jiān' },
-  { char: '扫地',   pinyin: 'sǎo dì' },
-  { char: '兄弟',   pinyin: 'xiōng dì' },
-  { char: '叔叔',   pinyin: 'shū shu' },
-  { char: '写字',   pinyin: 'xiě zì' },
-  { char: '阿姨',   pinyin: 'ā yí' },
-  { char: '抹桌椅',  pinyin: 'mā zhuō yǐ' },
-  { char: '听见笑声', pinyin: 'tīng jiàn xiào shēng' },
-  { char: '做完作业', pinyin: 'zuò wán zuò yè' },
-  { char: '躲到门后', pinyin: 'duǒ dào mén hòu' },
-  { char: '把窗户抹干净', pinyin: 'bǎ chuāng hù mā gān jìng' }
+  { char: '爱',    pinyin: 'ài' },
+  { char: '晚上',  pinyin: 'wǎn shàng' },
+  { char: '鸡鸭',  pinyin: 'jī yā' },
+  { char: '庆祝',  pinyin: 'qìng zhù' },
+  { char: '台上',  pinyin: 'tái shàng' },
+  { char: '因为',  pinyin: 'yīn wèi' },
+  { char: '唱歌',  pinyin: 'chàng gē' },
+  { char: '上课',  pinyin: 'shàng kè' },
+  { char: '儿童节', pinyin: 'ér tóng jié' },
+  { char: '国庆日', pinyin: 'guó qìng rì' },
+  { char: '听妈妈讲故事', pinyin: 'tīng mā ma jiǎng gù shì' }
 ];
 
 // G2 (sentence practice) not used for this lesson
@@ -2236,7 +2236,7 @@ async function admRunOCR(base64, mime, apiKey) {
   // Use Gemini if API key provided; fall back to Anthropic auto-injection (Claude.ai context)
   if (apiKey) {
     // ---- Google Gemini API ----
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key='
               + encodeURIComponent(apiKey);
     var resp = await fetch(url, {
       method: 'POST',
